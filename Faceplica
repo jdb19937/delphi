@@ -23,7 +23,7 @@ OBIECTA = oraculum.o utilia.o \
 
 BIBLIOTHECA = libdelphi.a
 
-omnia: $(BIBLIOTHECA)
+omnia: $(BIBLIOTHECA) fare
 
 $(BIBLIOTHECA): $(OBIECTA)
 	$(AR) $(ARFLAGS) $@ $^
@@ -34,6 +34,9 @@ $(BIBLIOTHECA): $(OBIECTA)
 omphalos/%.o: omphalos/%.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
 
+fare: fare.c $(BIBLIOTHECA) $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
+
 proba_omphalos: proba_omphalos.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) phantasma/libphantasma.a \
 	    `cat phantasma/nexus_phantasma` -lm -o $@
@@ -42,12 +45,16 @@ NEXUS_PROV = $(BIBLIOTHECA) phantasma/libphantasma.a \
              ison/libison.a crispus/libcrispus.a \
              `cat phantasma/nexus_phantasma`
 
-proba: proba_omphalos
+proba_fare: proba_fare.c fare $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< -o $@
+
+proba: proba_omphalos proba_fare
 	./proba_fictus
 	./proba_openai
 	./proba_xai
 	./proba_anthropic
 	./proba_omphalos
+	./proba_fare
 
 proba_openai: proba_openai.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
@@ -62,8 +69,8 @@ proba_fictus: proba_fictus.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
 
 purga:
-	rm -f $(OBIECTA) $(BIBLIOTHECA) \
-	    proba_omphalos proba_openai proba_xai proba_anthropic proba_fictus \
+	rm -f $(OBIECTA) $(BIBLIOTHECA) fare \
+	    proba_omphalos proba_openai proba_xai proba_anthropic proba_fictus proba_fare \
 	    omphalos_dieta_1526.bin omphalos_dieta_1526.lex
 
 linte:

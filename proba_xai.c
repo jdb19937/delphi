@@ -24,7 +24,7 @@ int main(void)
 
     char *responsum = NULL;
     int rc = oraculum_roga(
-        "xai/grok-3-mini", NULL,
+        "xai/grok-4-mini", NULL,
         "dic 'salve' et nihil aliud", &responsum
     );
 
