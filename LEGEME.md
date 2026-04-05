@@ -90,7 +90,9 @@ Provisores externi per `oraculum_adde_provisorem()` addi possunt.
 
 ## Omphalos
 
-Metamorphotes neuralis architecturae Llama-2 in directorio `omphalos/` iacet, Graece scriptus. Codex venditus est — non hic manutentus sed ex fonte externo inclusus. Provisor `omphalos/` exemplaria localia ex plica binaria (`.bin`) et lexatore (`.lex`) legit et signa generat sine rete, sine clavibus API.
+Metamorphotes neuralis architecturae Llama-2 in directorio `omphalos/` iacet, Graece scriptus. Provisor `omphalos/` exemplaria localia ex plica binaria (`.bin`) et lexatore (`.lex`) legit et signa generat sine rete, sine clavibus API.
+
+Fons originalis in `omphalos.βακ/` venditus est. Dialectum C totam Graecam adhibet — verba clavis, operatores, bibliothecas standardes, extensiones plicarum, omnia. Praemutator qui dialectum in C standardem convertit olim in systemate aedificationis inclusus erat sed non venditus est. Translatio in C standardem (`omphalos/`) per Claudium facta est ut codex sine praemutatore compilari posset.
 
 ## Numeri
 
