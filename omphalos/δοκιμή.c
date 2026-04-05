@@ -1,7 +1,7 @@
 /*
  * δοκιμή_ὀμφαλός.c — δοκιμὴ τοῦ μεταμορφωτοῦ ὀμφαλοῦ
  *
- * 1. Ἀναγιγνώσκει σῶμα ἐξ oracula/corpus/dieta_1526_*.txt
+ * 1. Ἀναγιγνώσκει σῶμα ἐξ corpus/dieta_1526_*.txt
  * 2. Ἀσκεῖ λεκτῆρα BPE
  * 3. Ἀρχικοποιεῖ μικρὸν ὑπόδειγμα
  * 4. Ἀσκεῖ ἐπὶ Ν βήματα, τυπώνει ζημίαν
@@ -46,12 +46,12 @@ static char *ἀνάγνωθι_πτυχήν(const char *ὁδός)
 static char *ἀνάγνωθι_σῶμα(void)
 {
     const char *πτυχαί[] = {
-        "oracula/corpus/dieta_1526_i.txt",
-        "oracula/corpus/dieta_1526_ii.txt",
-        "oracula/corpus/dieta_1526_iii.txt",
-        "oracula/corpus/dieta_1526_iv.txt",
-        "oracula/corpus/dieta_1526_v.txt",
-        "oracula/corpus/dieta_1526_vi.txt",
+        "corpus/dieta_1526_i.txt",
+        "corpus/dieta_1526_ii.txt",
+        "corpus/dieta_1526_iii.txt",
+        "corpus/dieta_1526_iv.txt",
+        "corpus/dieta_1526_v.txt",
+        "corpus/dieta_1526_vi.txt",
     };
     int ν_πτυχ = 6;
 

@@ -1,5 +1,5 @@
 /*
- * oracula/openai.c — provisor OpenAI (Responses API)
+ * openai.c — provisor OpenAI (Responses API)
  */
 
 #include "provisor.h"

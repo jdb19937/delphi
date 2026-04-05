@@ -1,5 +1,5 @@
 /*
- * oracula/xai.c — provisor xAI (Chat Completions API)
+ * xai.c — provisor xAI (Chat Completions API)
  */
 
 #include "provisor.h"

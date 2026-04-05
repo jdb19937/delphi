@@ -35,14 +35,36 @@ omphalos/%.o: omphalos/%.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
 
 proba_omphalos: proba_omphalos.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) proba_omphalos.c $(BIBLIOTHECA) phantasma/libphantasma.a \
-	    `cat phantasma/nexus_phantasma` -lm -o proba_omphalos
+	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) phantasma/libphantasma.a \
+	    `cat phantasma/nexus_phantasma` -lm -o $@
+
+NEXUS_PROV = $(BIBLIOTHECA) phantasma/libphantasma.a \
+             ison/libison.a crispus/libcrispus.a \
+             `cat phantasma/nexus_phantasma`
 
 proba: proba_omphalos
+	./proba_fictus
+	./proba_openai
+	./proba_xai
+	./proba_anthropic
 	./proba_omphalos
 
+proba_openai: proba_openai.c $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
+
+proba_xai: proba_xai.c $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
+
+proba_anthropic: proba_anthropic.c $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
+
+proba_fictus: proba_fictus.c $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
+
 purga:
-	rm -f $(OBIECTA) $(BIBLIOTHECA) proba_omphalos
+	rm -f $(OBIECTA) $(BIBLIOTHECA) \
+	    proba_omphalos proba_openai proba_xai proba_anthropic proba_fictus \
+	    omphalos_dieta_1526.bin omphalos_dieta_1526.lex
 
 linte:
 	insinulint -c $(FONTES) $(CAPITA)

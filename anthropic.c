@@ -1,5 +1,5 @@
 /*
- * oracula/anthropic.c — provisor Anthropic (Messages API)
+ * anthropic.c — provisor Anthropic (Messages API)
  */
 
 #include "provisor.h"

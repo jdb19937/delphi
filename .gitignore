@@ -1,3 +1,9 @@
 **/*.o
 libdelphi.a
 proba_omphalos
+proba_openai
+proba_anthropic
+proba_xai
+proba_fictus
+omphalos_dieta_1526.bin
+omphalos_dieta_1526.lex

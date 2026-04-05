@@ -1,7 +1,7 @@
 /*
  * proba_omphalos.c — probatio transformatoris omphalos
  *
- * 1. Legit corpus ex oracula/corpus/dieta_1526_*.txt
+ * 1. Legit corpus ex corpus/dieta_1526_*.txt
  * 2. Exercitat lexatorem BPE
  * 3. Initiat exemplar parvum
  * 4. Exercitat per N passus, imprimat damnum
@@ -46,12 +46,12 @@ static char *lege_plicam(const char *via)
 static char *lege_corpus(void)
 {
     const char *plicae[] = {
-        "oracula/corpus/dieta_1526_i.txt",
-        "oracula/corpus/dieta_1526_ii.txt",
-        "oracula/corpus/dieta_1526_iii.txt",
-        "oracula/corpus/dieta_1526_iv.txt",
-        "oracula/corpus/dieta_1526_v.txt",
-        "oracula/corpus/dieta_1526_vi.txt",
+        "corpus/dieta_1526_i.txt",
+        "corpus/dieta_1526_ii.txt",
+        "corpus/dieta_1526_iii.txt",
+        "corpus/dieta_1526_iv.txt",
+        "corpus/dieta_1526_v.txt",
+        "corpus/dieta_1526_vi.txt",
     };
     int n_plicae = 6;
 
@@ -91,7 +91,7 @@ static char *lege_corpus(void)
  * exercitatio
  * ================================================================ */
 
-#define N_PASSUS       20
+#define N_PASSUS       512
 #define LONGITUDO_SEQ  48
 #define N_MINI         4  /* fenestrae per passum (mini-manipulus) */
 #define GRADUS_DISC    3e-3f
