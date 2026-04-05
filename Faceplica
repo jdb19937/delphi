@@ -38,6 +38,6 @@ purga:
 	rm -f $(OBIECTA) $(BIBLIOTHECA)
 
 linte:
-	insinulint $(FONTES) $(CAPITA)
+	insinulint -c $(FONTES) $(CAPITA)
 
 .PHONY: omnia purga linte
