@@ -1,5 +1,5 @@
 /*
- * ὀμφαλός_χορηγός.c — provisor_t "nativus" πρὸς τὸ oraculum
+ * χορηγός.c — provisor_t omphalos πρὸς τὸ oraculum
  *
  * Ὑλοποιεῖ πρόσοψιν provisoris πρὸς τοπικοὺς συλλογισμοὺς
  * ἐξ ὑποδείγματος μεταμορφωτοῦ ὀμφαλοῦ. Οὐδὲν HTTP, οὐδὲν API.

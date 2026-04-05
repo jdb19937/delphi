@@ -1,0 +1,43 @@
+# Faceplica — libdelphi.a
+# Oraculum cum provisoribus et metamorphota omphalos.
+
+CC      ?= cc
+CFLAGS  ?= -Wall -Wextra -O2
+AR      ?= ar
+ARFLAGS = rcs
+
+INCP    = -I. -Icrispus -Iison -Iomphalos
+
+FONTES  = oraculum.c utilia.c \
+          openai.c anthropic.c xai.c fictus.c \
+          omphalos/δρόμος.c omphalos/λεκτήρ.c \
+          omphalos/ἄσκησις.c omphalos/χορηγός.c
+
+CAPITA  = oraculum.h provisor.h utilia.h \
+          omphalos/λεκτήρ.h omphalos/ὀμφαλός.h
+
+OBIECTA = oraculum.o utilia.o \
+          openai.o anthropic.o xai.o fictus.o \
+          omphalos/δρόμος.o omphalos/λεκτήρ.o \
+          omphalos/ἄσκησις.o omphalos/χορηγός.o
+
+BIBLIOTHECA = libdelphi.a
+
+omnia: $(BIBLIOTHECA)
+
+$(BIBLIOTHECA): $(OBIECTA)
+	$(AR) $(ARFLAGS) $@ $^
+
+%.o: %.c $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
+
+omphalos/%.o: omphalos/%.c $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
+
+purga:
+	rm -f $(OBIECTA) $(BIBLIOTHECA)
+
+linte:
+	insinulint $(FONTES) $(CAPITA)
+
+.PHONY: omnia purga linte
