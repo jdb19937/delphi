@@ -91,14 +91,14 @@ static char *lege_corpus(void)
  * exercitatio
  * ================================================================ */
 
-#define N_PASSUS      20
+#define N_PASSUS       20
 #define LONGITUDO_SEQ  48
-#define N_MINI          4       /* fenestrae per passum (mini-manipulus) */
-#define GRADUS_DISC   3e-3f
-#define BETA1         0.9f
-#define BETA2         0.999f
-#define EPSILON       1e-8f
-#define DESICATIO     1e-2f
+#define N_MINI         4  /* fenestrae per passum (mini-manipulus) */
+#define GRADUS_DISC    3e-3f
+#define BETA1          0.9f
+#define BETA2          0.999f
+#define EPSILON        1e-8f
+#define DESICATIO      1e-2f
 #define NUNTIA_PASSUS  10
 
 static void exercita(

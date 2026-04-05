@@ -34,10 +34,17 @@ $(BIBLIOTHECA): $(OBIECTA)
 omphalos/%.o: omphalos/%.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
 
+proba_omphalos: proba_omphalos.c $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) proba_omphalos.c $(BIBLIOTHECA) phantasma/libphantasma.a \
+	    `cat phantasma/nexus_phantasma` -lm -o proba_omphalos
+
+proba: proba_omphalos
+	./proba_omphalos
+
 purga:
-	rm -f $(OBIECTA) $(BIBLIOTHECA)
+	rm -f $(OBIECTA) $(BIBLIOTHECA) proba_omphalos
 
 linte:
 	insinulint -c $(FONTES) $(CAPITA)
 
-.PHONY: omnia purga linte
+.PHONY: omnia purga linte proba
