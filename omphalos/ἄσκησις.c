@@ -99,9 +99,9 @@ static void rope_ἀναδρ(float *δ_v, int θέσις, int κεφ_διαστ)
 {
     for (int i = 0; i < κεφ_διαστ; i += 2) {
         float συχν = 1.0f / powf(10000.0f, (float)i / κεφ_διαστ);
-        float τιμ   = θέσις * συχν;
-        float fcr      = cosf(τιμ), fci = sinf(τιμ);
-        float v0       = δ_v[i], v1 = δ_v[i + 1];
+        float τιμ  = θέσις * συχν;
+        float fcr  = cosf(τιμ), fci = sinf(τιμ);
+        float v0   = δ_v[i], v1 = δ_v[i + 1];
         /* ἀνάστροφος στροφή: ἀρνητικὴ γωνία */
         δ_v[i]     = v0 * fcr + v1 * fci;
         δ_v[i + 1] = -v0 * fci + v1 * fcr;
@@ -116,7 +116,7 @@ static float *ἐκχώρ_σταθμά_ἐπίπεδα(
     const ομφ_σύνθεσις_t *σ, int κοινά,
     ομφ_σταθμά_t *π
 ) {
-    size_t ν     = ομφ_μέγεθος_σταθμῶν(σ, κοινά);
+    size_t ν   = ομφ_μέγεθος_σταθμῶν(σ, κοινά);
     float *δεδ = calloc(ν, sizeof(float));
     if (!δεδ)
         return NULL;
@@ -145,13 +145,13 @@ int ομφ_ἄσκησις_ἄρχε(ομφ_ἄσκησις_t *ἀσκ, const ο
     if (!ἀσκ->δύναμις_δεδ)
         return -1;
 
-    int δ      = σ->διάστασις;
-    int δκ    = σ->διάστ_κρυ;
-    int Λ      = σ->στρώματα;
-    int Κ      = σ->κεφαλαί;
+    int δ    = σ->διάστασις;
+    int δκ   = σ->διάστ_κρυ;
+    int Λ    = σ->στρώματα;
+    int Κ    = σ->κεφαλαί;
     int Κκτ  = σ->κεφαλαί_κτ;
     int κτ_δ = (δ / Κ) * Κκτ;
-    int μμ    = σ->μῆκος_μέγ;
+    int μμ   = σ->μῆκος_μέγ;
 
 #define ΑΜΝΗ(πεδίον, ν) \
     ἀσκ->πεδίον = calloc((size_t)(ν), sizeof(float)); \
@@ -201,8 +201,8 @@ float ομφ_ἀναδρομή(
     int σημεῖον, int σημεῖον_στόχος, int θέσις
 ) {
     ομφ_σύνθεσις_t *σ = &ομφ->σύνθεσις;
-    ομφ_σταθμά_t   *π   = &ομφ->σταθμά;
-    ομφ_σταθμά_t   *γ   = &ἀσκ->κλίσεις;
+    ομφ_σταθμά_t   *π = &ομφ->σταθμά;
+    ομφ_σταθμά_t   *γ = &ἀσκ->κλίσεις;
 
     int δ      = σ->διάστασις;
     int δκ     = σ->διάστ_κρυ;
@@ -216,13 +216,13 @@ float ομφ_ἀναδρομή(
     int κτ_πολ = Κ / Κκτ;
 
     /* --- προσωρινὰ ταμιεῖα --- */
-    float *δ_x      = calloc((size_t)δ, sizeof(float));
-    float *δ_xb     = calloc((size_t)δ, sizeof(float));
-    float *δ_hb     = calloc((size_t)δκ, sizeof(float));
-    float *δ_hb2    = calloc((size_t)δκ, sizeof(float));
-    float *δ_q      = calloc((size_t)δ, sizeof(float));
-    float *δ_k      = calloc((size_t)κτ_δ, sizeof(float));
-    float *δ_v      = calloc((size_t)κτ_δ, sizeof(float));
+    float *δ_x   = calloc((size_t)δ, sizeof(float));
+    float *δ_xb  = calloc((size_t)δ, sizeof(float));
+    float *δ_hb  = calloc((size_t)δκ, sizeof(float));
+    float *δ_hb2 = calloc((size_t)δκ, sizeof(float));
+    float *δ_q   = calloc((size_t)δ, sizeof(float));
+    float *δ_k   = calloc((size_t)κτ_δ, sizeof(float));
+    float *δ_v   = calloc((size_t)κτ_δ, sizeof(float));
     float *δ_λογ = calloc((size_t)Λξ, sizeof(float));
     if (
         !δ_x || !δ_xb || !δ_hb || !δ_hb2 ||
@@ -276,29 +276,29 @@ float ομφ_ἀναδρομή(
     for (int λ = Λ - 1; λ >= 0; λ--) {
         float *Σ_rms_πρ = π->rms_πρ   + (size_t)λ * δ;
         float *Σ_rms_δδ = π->rms_δδ   + (size_t)λ * δ;
-        float *Σ_wq       = π->wq       + (size_t)λ * δ * δ;
-        float *Σ_wk       = π->wk       + (size_t)λ * κτ_δ * δ;
-        float *Σ_wv       = π->wv       + (size_t)λ * κτ_δ * δ;
-        float *Σ_wo       = π->wo       + (size_t)λ * δ * δ;
-        float *Σ_w1       = π->w1       + (size_t)λ * δκ * δ;
-        float *Σ_w2       = π->w2       + (size_t)λ * δ * δκ;
-        float *Σ_w3       = π->w3       + (size_t)λ * δκ * δ;
+        float *Σ_wq     = π->wq       + (size_t)λ * δ * δ;
+        float *Σ_wk     = π->wk       + (size_t)λ * κτ_δ * δ;
+        float *Σ_wv     = π->wv       + (size_t)λ * κτ_δ * δ;
+        float *Σ_wo     = π->wo       + (size_t)λ * δ * δ;
+        float *Σ_w1     = π->w1       + (size_t)λ * δκ * δ;
+        float *Σ_w2     = π->w2       + (size_t)λ * δ * δκ;
+        float *Σ_w3     = π->w3       + (size_t)λ * δκ * δ;
 
         float *Γ_rms_πρ = γ->rms_πρ   + (size_t)λ * δ;
         float *Γ_rms_δδ = γ->rms_δδ   + (size_t)λ * δ;
-        float *Γ_wq       = γ->wq       + (size_t)λ * δ * δ;
-        float *Γ_wk       = γ->wk       + (size_t)λ * κτ_δ * δ;
-        float *Γ_wv       = γ->wv       + (size_t)λ * κτ_δ * δ;
-        float *Γ_wo       = γ->wo       + (size_t)λ * δ * δ;
-        float *Γ_w1       = γ->w1       + (size_t)λ * δκ * δ;
-        float *Γ_w2       = γ->w2       + (size_t)λ * δ * δκ;
-        float *Γ_w3       = γ->w3       + (size_t)λ * δκ * δ;
+        float *Γ_wq     = γ->wq       + (size_t)λ * δ * δ;
+        float *Γ_wk     = γ->wk       + (size_t)λ * κτ_δ * δ;
+        float *Γ_wv     = γ->wv       + (size_t)λ * κτ_δ * δ;
+        float *Γ_wo     = γ->wo       + (size_t)λ * δ * δ;
+        float *Γ_w1     = γ->w1       + (size_t)λ * δκ * δ;
+        float *Γ_w2     = γ->w2       + (size_t)λ * δ * δκ;
+        float *Γ_w3     = γ->w3       + (size_t)λ * δκ * δ;
 
-        float *xb_δδ   = ἀσκ->μνήμη_xb_δδ + (size_t)λ * δ;
-        float *hb_μ     = ἀσκ->μνήμη_hb     + (size_t)λ * δκ;
-        float *hb2_μ    = ἀσκ->μνήμη_hb2    + (size_t)λ * δκ;
+        float *xb_δδ = ἀσκ->μνήμη_xb_δδ + (size_t)λ * δ;
+        float *hb_μ  = ἀσκ->μνήμη_hb     + (size_t)λ * δκ;
+        float *hb2_μ = ἀσκ->μνήμη_hb2    + (size_t)λ * δκ;
         float *x_εἰσ = ἀσκ->μνήμη_x      + (size_t)λ * δ;
-        float *x_μέσ  = ἀσκ->μνήμη_x      + (size_t)(λ+1) * δ;
+        float *x_μέσ = ἀσκ->μνήμη_x      + (size_t)(λ+1) * δ;
 
         /* --- ἀναδρομὴ FFN --- */
         float *δ_δδ = calloc((size_t)δ, sizeof(float));
@@ -327,8 +327,8 @@ float ομφ_ἀναδρομή(
             float sig       = 1.0f / (1.0f + expf(-hb_μ[i]));
             float silu_τιμ  = hb_μ[i] * sig;
             float silu_κλίσ = sig * (1.0f + hb_μ[i] * (1.0f - sig));
-            δ_hb2[i] = δ_hb[i] * silu_τιμ;
-            δ_hb[i]  = δ_hb[i] * hb2_μ[i] * silu_κλίσ;
+            δ_hb2[i]        = δ_hb[i] * silu_τιμ;
+            δ_hb[i]         = δ_hb[i] * hb2_μ[i] * silu_κλίσ;
         }
 
         /* ἀναδρομὴ διὰ w1 */
@@ -350,8 +350,8 @@ float ομφ_ἀναδρομή(
 
         /* --- ἀναδρομὴ προσοχῆς --- */
         float *xb_πρ = ἀσκ->μνήμη_xb_πρ + (size_t)λ * δ;
-        float *q_μ    = ἀσκ->μνήμη_q      + (size_t)λ * δ;
-        float *πρ_μ = ἀσκ->μνήμη_πρ     + (size_t)λ * Κ * μμ;
+        float *q_μ   = ἀσκ->μνήμη_q      + (size_t)λ * δ;
+        float *πρ_μ  = ἀσκ->μνήμη_πρ     + (size_t)λ * Κ * μμ;
 
         float *δ_πρ_ἐξ = calloc((size_t)δ, sizeof(float));
         if (!δ_πρ_ἐξ)
@@ -369,7 +369,7 @@ float ομφ_ἀναδρομή(
             float *xb_πρὸ_wo = calloc((size_t)δ, sizeof(float));
             if (xb_πρὸ_wo) {
                 for (int η = 0; η < Κ; η++) {
-                    float *xη     = xb_πρὸ_wo + η * κδ;
+                    float *xη   = xb_πρὸ_wo + η * κδ;
                     int ηκτ     = η / κτ_πολ;
                     float *πρ_η = πρ_μ + η * μμ;
                     for (int τ = 0; τ <= θέσις; τ++) {
@@ -393,15 +393,15 @@ float ομφ_ἀναδρομή(
         float ἀντ_ρίζ_κδ = 1.0f / sqrtf((float)κδ);
 
         for (int η = 0; η < Κ; η++) {
-            float *q_η     = q_μ    + η * κδ;
-            float *δ_q_η  = δ_q    + η * κδ;
+            float *q_η   = q_μ    + η * κδ;
+            float *δ_q_η = δ_q    + η * κδ;
             float *πρ_η  = πρ_μ   + η * μμ;
             float *δ_κ_η = δ_xb_συνέν + η * κδ;
             int ηκτ      = η / κτ_πολ;
 
             for (int τ = 0; τ <= θέσις; τ++) {
                 float *δ_v_ηκτ = δ_v + ηκτ * κδ;
-                float α         = πρ_η[τ];
+                float α        = πρ_η[τ];
                 for (int i = 0; i < κδ; i++)
                     δ_v_ηκτ[i] += α * δ_κ_η[i];
             }
@@ -433,7 +433,7 @@ float ομφ_ἀναδρομή(
 
                     {
                         float *δ_k_ηκτ = δ_k + ηκτ * κδ;
-                        float δβπ       = δ_βαθμ_πρό[θέσις];
+                        float δβπ      = δ_βαθμ_πρό[θέσις];
                         for (int i = 0; i < κδ; i++)
                             δ_k_ηκτ[i] += δβπ * q_η[i];
                     }
@@ -505,8 +505,8 @@ float ομφ_κλίσεις_κεῖρον(
     ομφ_ἄσκησις_t *ἀσκ, const ομφ_σύνθεσις_t *σ,
     float μέγ_κανών
 ) {
-    size_t ν        = ομφ_μέγεθος_σταθμῶν(σ, 1);
-    float *γ        = ἀσκ->κλίσ_δεδ;
+    size_t ν    = ομφ_μέγεθος_σταθμῶν(σ, 1);
+    float *γ    = ἀσκ->κλίσ_δεδ;
     float κανών = 0.0f;
     for (size_t i = 0; i < ν; i++)
         κανών += γ[i] * γ[i];
@@ -529,7 +529,7 @@ void ομφ_βῆμα_ἀδάμ(
     float ἐψιλον, float ξήρανσις
 ) {
     ἀσκ->βῆμα++;
-    float τ    = (float)ἀσκ->βῆμα;
+    float τ   = (float)ἀσκ->βῆμα;
     float δμ1 = 1.0f - powf(βῆτα1, τ);
     float δμ2 = 1.0f - powf(βῆτα2, τ);
 
@@ -537,7 +537,7 @@ void ομφ_βῆμα_ἀδάμ(
     float *σ = ομφ->δεδομένα;
     float *γ = ἀσκ->κλίσ_δεδ;
     float *μ = ἀσκ->ὁρμή_δεδ;
-    float *v  = ἀσκ->δύναμις_δεδ;
+    float *v = ἀσκ->δύναμις_δεδ;
 
     for (size_t i = 0; i < ν; i++) {
         float γι     = γ[i];
