@@ -13,7 +13,7 @@
 
 #include "omphalos/ὀμφαλός.h"
 #include "omphalos/λεκτήρ.h"
-#include "phantasma/computo.h"
+#include "computo.h"
 
 #include <math.h>
 #include <stdio.h>

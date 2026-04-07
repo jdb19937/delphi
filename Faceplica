@@ -7,7 +7,7 @@ AR      ?= ar
 ARFLAGS = rcs
 
 PREFIX = /opt/apotheca
-INCP    = -I. -Iomphalos -I$(PREFIX)/include/crispus -I$(PREFIX)/include/ison
+INCP    = -I. -I$(PREFIX)/include/phantasma -I$(PREFIX)/include/crispus -I$(PREFIX)/include/ison
 
 FONTES  = oraculum.c utilia.c \
           openai.c anthropic.c xai.c fictus.c \
@@ -49,7 +49,7 @@ NEXUS_PROV = $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
 proba_fare: proba_fare.c fare $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< -o $@
 
-proba: proba_omphalos proba_fare
+proba: proba_omphalos proba_fare proba_fictus proba_openai proba_anthropic proba_xai
 	./proba_fictus
 	./proba_openai
 	./proba_xai
