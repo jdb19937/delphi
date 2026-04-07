@@ -6,7 +6,8 @@ CFLAGS  ?= -Wall -Wextra -O2
 AR      ?= ar
 ARFLAGS = rcs
 
-INCP    = -I. -Icrispus -Iison -Iomphalos
+PREFIX = /opt/apotheca
+INCP    = -I. -Iomphalos -I$(PREFIX)/include/crispus -I$(PREFIX)/include/ison
 
 FONTES  = oraculum.c utilia.c \
           openai.c anthropic.c xai.c fictus.c \
@@ -38,12 +39,12 @@ fare: fare.c $(BIBLIOTHECA) $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
 
 proba_omphalos: proba_omphalos.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) phantasma/libphantasma.a \
-	    `cat phantasma/nexus_phantasma` -lm -o $@
+	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
+	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
 
-NEXUS_PROV = $(BIBLIOTHECA) phantasma/libphantasma.a \
-             ison/libison.a crispus/libcrispus.a \
-             `cat phantasma/nexus_phantasma`
+NEXUS_PROV = $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
+             $(PREFIX)/lib/libison.a $(PREFIX)/lib/libcrispus.a \
+             `cat $(PREFIX)/lib/nexus_phantasma`
 
 proba_fare: proba_fare.c fare $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< -o $@
@@ -68,6 +69,13 @@ proba_anthropic: proba_anthropic.c $(CAPITA)
 proba_fictus: proba_fictus.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
 
+colloca: omnia
+	install -d $(PREFIX)/bin $(PREFIX)/lib $(PREFIX)/include/delphi/omphalos
+	install -m 755 fare $(PREFIX)/bin/
+	install -m 644 $(BIBLIOTHECA) $(PREFIX)/lib/
+	install -m 644 oraculum.h provisor.h utilia.h $(PREFIX)/include/delphi/
+	install -m 644 omphalos/λεκτήρ.h omphalos/ὀμφαλός.h $(PREFIX)/include/delphi/omphalos/
+
 purga:
 	rm -f $(OBIECTA) $(BIBLIOTHECA) fare \
 	    proba_omphalos proba_openai proba_xai proba_anthropic proba_fictus proba_fare \
@@ -76,4 +84,4 @@ purga:
 linte:
 	insinulint -c $(FONTES) $(CAPITA)
 
-.PHONY: omnia purga linte proba
+.PHONY: omnia colloca purga linte proba
