@@ -27,12 +27,12 @@ static const provisor_t *provisores[8] = {
     &provisor_xai,
     &provisor_anthropic,
     &provisor_fictus,
-    &provisor_ὀμφαλός,
+    &provisor_omphalos,
     NULL
 };
 
-/* ὀμφαλός_θές_ὄνομα — communicat nomen exemplaris ante extrahe() */
-extern void ὀμφαλός_θές_ὄνομα(const char *nomen);
+/* omphalos_pone_nomen — communicat nomen exemplaris ante extrahe() */
+extern void omphalos_pone_nomen(const char *nomen);
 
 void oraculum_adde_provisorem(const provisor_t *prov)
 {
@@ -304,8 +304,8 @@ int oraculum_roga(
         *responsum = prov->extrahe(rogatum);
         return *responsum ? 0 : -1;
     }
-    if (strcmp(prov->nomen, "ὀμφαλός") == 0) {
-        ὀμφαλός_θές_ὄνομα(nomen);
+    if (strcmp(prov->nomen, "omphalos") == 0) {
+        omphalos_pone_nomen(nomen);
         *responsum = prov->extrahe(rogatum);
         return *responsum ? 0 : -1;
     }
@@ -394,10 +394,10 @@ int oraculum_mitte(
     if (
         strcmp(prov->nomen, "munda") == 0 ||
         strcmp(prov->nomen, "fictus") == 0 ||
-        strcmp(prov->nomen, "ὀμφαλός") == 0
+        strcmp(prov->nomen, "omphalos") == 0
     ) {
-        if (strcmp(prov->nomen, "ὀμφαλός") == 0)
-            ὀμφαλός_θές_ὄνομα(nomen);
+        if (strcmp(prov->nomen, "omphalos") == 0)
+            omphalos_pone_nomen(nomen);
         f->responsum = prov->extrahe(rogatum);
         f->exitus    = 0;
         f->actum     = FOSSA_PERFECTA;

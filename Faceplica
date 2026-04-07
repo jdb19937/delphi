@@ -10,17 +10,17 @@ PREFIX = /opt/apotheca
 INCP    = -I. -I$(PREFIX)/include/phantasma -I$(PREFIX)/include/crispus -I$(PREFIX)/include/ison
 
 FONTES  = oraculum.c utilia.c \
-          openai.c anthropic.c xai.c fictus.c \
+          openai.c anthropic.c xai.c fictus.c omphalos.c \
           omphalos/δρόμος.c omphalos/λεκτήρ.c \
-          omphalos/ἄσκησις.c omphalos/χορηγός.c
+          omphalos/ἄσκησις.c
 
-CAPITA  = oraculum.h provisor.h utilia.h \
+CAPITA  = oraculum.h provisor.h utilia.h omphalos.h \
           omphalos/λεκτήρ.h omphalos/ὀμφαλός.h
 
 OBIECTA = oraculum.o utilia.o \
-          openai.o anthropic.o xai.o fictus.o \
+          openai.o anthropic.o xai.o fictus.o omphalos.o \
           omphalos/δρόμος.o omphalos/λεκτήρ.o \
-          omphalos/ἄσκησις.o omphalos/χορηγός.o
+          omphalos/ἄσκησις.o
 
 BIBLIOTHECA = libdelphi.a
 
@@ -37,6 +37,10 @@ omphalos/%.o: omphalos/%.c $(CAPITA)
 
 fare: fare.c $(BIBLIOTHECA) $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
+
+exercita: exercita.c $(BIBLIOTHECA) $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
+	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
 
 proba_omphalos: proba_omphalos.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
@@ -73,11 +77,11 @@ colloca: omnia
 	install -d $(PREFIX)/bin $(PREFIX)/lib $(PREFIX)/include/delphi/omphalos
 	install -m 755 fare $(PREFIX)/bin/
 	install -m 644 $(BIBLIOTHECA) $(PREFIX)/lib/
-	install -m 644 oraculum.h provisor.h utilia.h $(PREFIX)/include/delphi/
+	install -m 644 oraculum.h provisor.h utilia.h omphalos.h $(PREFIX)/include/delphi/
 	install -m 644 omphalos/λεκτήρ.h omphalos/ὀμφαλός.h $(PREFIX)/include/delphi/omphalos/
 
 purga:
-	rm -f $(OBIECTA) $(BIBLIOTHECA) fare \
+	rm -f $(OBIECTA) $(BIBLIOTHECA) fare exercita \
 	    proba_omphalos proba_openai proba_xai proba_anthropic proba_fictus proba_fare \
 	    omphalos_dieta_1526.bin omphalos_dieta_1526.lex
 
