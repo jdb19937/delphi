@@ -206,18 +206,13 @@ int ομφ_λεκτήρ_σῶσον(const ομφ_λεκτήρ_t *λεκ, const c
     if (!π)
         return -1;
 
-    unsigned int μαγικόν = ΟΜΦ_ΛΕΞ_ΣΗΜΕΙΟΝ_ΜΑΓΙΚΟΝ;
-    fwrite(&μαγικόν,           sizeof(unsigned int), 1, π);
-    fwrite(&λεκ->λεξ_μέγεθος, sizeof(int),          1, π);
-    fwrite(&λεκ->μέγ_λεξ_μῆκ, sizeof(int),          1, π);
+    /* forma llama2.c: max_token_length + (score, len, string)… */
+    fwrite(&λεκ->μέγ_λεξ_μῆκ, sizeof(int), 1, π);
 
     for (int i = 0; i < λεκ->λεξ_μέγεθος; i++) {
         fwrite(&λεκ->λέξεις[i].βαθμός, sizeof(float), 1, π);
         fwrite(&λεκ->λέξεις[i].μῆκος,  sizeof(int),   1, π);
-        fwrite(
-            λεκ->λέξεις[i].νῆμα,     1,
-            (size_t)λεκ->λέξεις[i].μῆκος + 1, π
-        );
+        fwrite(λεκ->λέξεις[i].νῆμα, 1, (size_t)λεκ->λέξεις[i].μῆκος, π);
     }
 
     fclose(π);
@@ -230,45 +225,42 @@ int ομφ_λεκτήρ_ἀνάγνωθι(ομφ_λεκτήρ_t *λεκ, const c
     if (!π)
         return -1;
 
-    unsigned int μαγικόν;
-    if (
-        fread(&μαγικόν, sizeof(unsigned int), 1, π) != 1 ||
-        μαγικόν != ΟΜΦ_ΛΕΞ_ΣΗΜΕΙΟΝ_ΜΑΓΙΚΟΝ
-    ) {
+    /* forma llama2.c: max_token_length + (score, len, string)… */
+    int μλμ;
+    if (fread(&μλμ, sizeof(int), 1, π) != 1) {
         fclose(π);
         return -1;
     }
-
-    int λμ, μλμ;
-    if (
-        fread(&λμ,  sizeof(int), 1, π) != 1 ||
-        fread(&μλμ, sizeof(int), 1, π) != 1 ||
-        λμ > λεκ->λεξ_μέγ
-    ) {
-        fclose(π);
-        return -1;
-    }
-    λεκ->λεξ_μέγεθος = λμ;
     λεκ->μέγ_λεξ_μῆκ = μλμ;
 
-    for (int i = 0; i < λμ; i++) {
+    int i = 0;
+    while (i < λεκ->λεξ_μέγ) {
         float βαθμός;
         int μῆκ;
-        if (
-            fread(&βαθμός, sizeof(float), 1, π) != 1 ||
-            fread(&μῆκ,    sizeof(int),   1, π) != 1 ||
-            μῆκ <= 0 || μῆκ >= ΟΜΦ_ΛΕΞ_ΛΕΞΗΜΑ_ΜΕΓ
-        ) {
+        if (fread(&βαθμός, sizeof(float), 1, π) != 1)
+            break; /* finis tabulae */
+        if (fread(&μῆκ, sizeof(int), 1, π) != 1)
+            break;
+        if (μῆκ < 0 || μῆκ >= ΟΜΦ_ΛΕΞ_ΛΕΞΗΜΑ_ΜΕΓ) {
             fclose(π);
             return -1;
         }
-        λεκ->λέξεις[i].βαθμός = βαθμός;
+        if (μῆκ > 0 && fread(λεκ->λέξεις[i].νῆμα, 1, (size_t)μῆκ, π) != (size_t)μῆκ) {
+            fclose(π);
+            return -1;
+        }
+        λεκ->λέξεις[i].νῆμα[μῆκ] = '\0';
+        /* <0xNN> → verus ὀκτέτος */
+        if (μῆκ == 6 && λεκ->λέξεις[i].νῆμα[0] == '<') {
+            λεκ->λέξεις[i].νῆμα[0] = (char)strtol(λεκ->λέξεις[i].νῆμα + 1, NULL, 16);
+            λεκ->λέξεις[i].νῆμα[1] = '\0';
+            μῆκ = 1;
+        }
         λεκ->λέξεις[i].μῆκος  = μῆκ;
-        if (fread(λεκ->λέξεις[i].νῆμα, 1, (size_t)μῆκ + 1, π) != (size_t)μῆκ + 1) {
-            fclose(π);
-            return -1;
-        }
+        λεκ->λέξεις[i].βαθμός = βαθμός;
+        i++;
     }
+    λεκ->λεξ_μέγεθος = i;
 
     fclose(π);
     οἰκοδόμησον_τάξιν(λεκ);
@@ -288,9 +280,29 @@ void ομφ_λεκτήρ_τέμε(
     if (ἀρχ)
         σημεῖα[ν++] = 1; /* σημεῖον ἀρχῆς (σύμβασις: δείκτης 1) */
 
+    /*
+     * sentencepiece: token 0 non est ὀκτέτος simplex (e.g. "<unk>").
+     * dummy prefix spatii et quaestio ὀκτέτων per νῆμα necessariae.
+     * nostri tokenizatores: token 0 = byte 0x00 (μῆκος == 1).
+     */
+    int sp = (λεκ->λέξεις[0].μῆκος > 1);
+
+    if (sp && *κείμενον != '\0') {
+        int σπ = ζήτησον_λέξημα(λεκ, " ");
+        if (σπ >= 0)
+            σημεῖα[ν++] = σπ;
+    }
+
     /* ἀρχή: σημεῖα δι᾽ ἕκαστον ὀκτέτον */
-    for (const unsigned char *δ = (const unsigned char *)κείμενον; *δ; δ++)
-        σημεῖα[ν++] = (int)*δ;
+    for (const unsigned char *δ = (const unsigned char *)κείμενον; *δ; δ++) {
+        if (sp) {
+            char βτ[2] = { (char)*δ, '\0' };
+            int ταυτ    = ζήτησον_λέξημα(λεκ, βτ);
+            σημεῖα[ν++] = ταυτ >= 0 ? ταυτ : (int)*δ;
+        } else {
+            σημεῖα[ν++] = (int)*δ;
+        }
+    }
 
     /* BPE: συγχώνευσον ζεύγη ἕως δυνατόν */
     char ζεῦγος[ΟΜΦ_ΛΕΞ_ΛΕΞΗΜΑ_ΜΕΓ * 2];
