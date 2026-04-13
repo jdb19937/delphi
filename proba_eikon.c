@@ -36,7 +36,8 @@ static float max_diff(const float *a, const float *b, int n)
     float d = 0.0f;
     for (int i = 0; i < n; i++) {
         float e = fabsf(a[i] - b[i]);
-        if (e > d) d = e;
+        if (e > d)
+            d = e;
     }
     return d;
 }
@@ -73,7 +74,10 @@ static int proba_matvec(int m, int n, int *n_ok, int *n_fal)
     if (!W || !x || !y_c || !y_g) {
         printf("FALLIT: malloc\n");
         (*n_fal)++;
-        free(W); free(x); free(y_c); free(y_g);
+        free(W);
+        free(x);
+        free(y_c);
+        free(y_g);
         return -1;
     }
 
@@ -144,7 +148,10 @@ static int proba_matvec(int m, int n, int *n_ok, int *n_fal)
     }
 
 cleanup_mv:
-    free(W); free(x); free(y_c); free(y_g);
+    free(W);
+    free(x);
+    free(y_c);
+    free(y_g);
     return 0;
 }
 
@@ -166,7 +173,10 @@ static int proba_matvec_trans(int m, int n, int *n_ok, int *n_fal)
     if (!W || !x || !y_c || !y_g) {
         printf("FALLIT: malloc\n");
         (*n_fal)++;
-        free(W); free(x); free(y_c); free(y_g);
+        free(W);
+        free(x);
+        free(y_c);
+        free(y_g);
         return -1;
     }
 
@@ -187,10 +197,11 @@ static int proba_matvec_trans(int m, int n, int *n_ok, int *n_fal)
         pfr_vector_f_t vx = { m, x, NULL };
         pfr_vector_f_t vy = { n, y_g, NULL };
 
-        if (pfr_in_gpu_mitte_f(&mW) != 0 ||
+        if (
+            pfr_in_gpu_mitte_f(&mW) != 0 ||
             pfr_in_gpu_mitte_vf(&vx) != 0 ||
-            pfr_in_gpu_mitte_vf(&vy) != 0)
-        {
+            pfr_in_gpu_mitte_vf(&vy) != 0
+        ) {
             printf("FALLIT: gpu alloc\n");
             (*n_fal)++;
             goto cleanup_mt;
@@ -216,7 +227,10 @@ static int proba_matvec_trans(int m, int n, int *n_ok, int *n_fal)
     }
 
 cleanup_mt:
-    free(W); free(x); free(y_c); free(y_g);
+    free(W);
+    free(x);
+    free(y_c);
+    free(y_g);
     return 0;
 }
 
@@ -238,7 +252,10 @@ static int proba_ger(int m, int n, int *n_ok, int *n_fal)
     if (!A_c || !A_g || !x || !y) {
         printf("FALLIT: malloc\n");
         (*n_fal)++;
-        free(A_c); free(A_g); free(x); free(y);
+        free(A_c);
+        free(A_g);
+        free(x);
+        free(y);
         return -1;
     }
 
@@ -261,10 +278,11 @@ static int proba_ger(int m, int n, int *n_ok, int *n_fal)
         pfr_vector_f_t vx = { m, x, NULL };
         pfr_vector_f_t vy = { n, y, NULL };
 
-        if (pfr_in_gpu_mitte_f(&mA) != 0 ||
+        if (
+            pfr_in_gpu_mitte_f(&mA) != 0 ||
             pfr_in_gpu_mitte_vf(&vx) != 0 ||
-            pfr_in_gpu_mitte_vf(&vy) != 0)
-        {
+            pfr_in_gpu_mitte_vf(&vy) != 0
+        ) {
             printf("FALLIT: gpu alloc\n");
             (*n_fal)++;
             goto cleanup_ger;
@@ -290,7 +308,10 @@ static int proba_ger(int m, int n, int *n_ok, int *n_fal)
     }
 
 cleanup_ger:
-    free(A_c); free(A_g); free(x); free(y);
+    free(A_c);
+    free(A_g);
+    free(x);
+    free(y);
     return 0;
 }
 
@@ -305,15 +326,19 @@ static int proba_fc_fwd(int m, int n, int *n_ok, int *n_fal)
     printf("  %-40s ", nom);
     fflush(stdout);
 
-    float *W = malloc((size_t)m * n * sizeof(float));
-    float *b = malloc((size_t)m * sizeof(float));
-    float *x = malloc((size_t)n * sizeof(float));
+    float *W   = malloc((size_t)m * n * sizeof(float));
+    float *b   = malloc((size_t)m * sizeof(float));
+    float *x   = malloc((size_t)n * sizeof(float));
     float *y_c = calloc((size_t)m, sizeof(float));
     float *y_g = calloc((size_t)m, sizeof(float));
     if (!W || !b || !x || !y_c || !y_g) {
         printf("FALLIT: malloc\n");
         (*n_fal)++;
-        free(W); free(b); free(x); free(y_c); free(y_g);
+        free(W);
+        free(b);
+        free(x);
+        free(y_c);
+        free(y_g);
         return -1;
     }
 
@@ -327,7 +352,8 @@ static int proba_fc_fwd(int m, int n, int *n_ok, int *n_fal)
         pfr_vector_f_t vx = { n, x, NULL };
         pfr_vector_f_t vy = { m, y_c, NULL };
         pfr_cpu_matvec_f(&vy, &mW, &vx);
-        for (int i = 0; i < m; i++) y_c[i] += b[i];
+        for (int i = 0; i < m; i++)
+            y_c[i] += b[i];
     }
 
     /* GPU — simula quod eikon facit: alloc per call */
@@ -341,7 +367,8 @@ static int proba_fc_fwd(int m, int n, int *n_ok, int *n_fal)
         pfr_in_gpu_mitte_vf(&vy);
         pfr_matvec_f(&vy, &mW, &vx);
         pfr_ex_gpu_cape_vf(&vy);
-        for (int i = 0; i < m; i++) y_g[i] += b[i];
+        for (int i = 0; i < m; i++)
+            y_g[i] += b[i];
 
         float d = max_diff(y_c, y_g, m);
         if (d > 1e-3f) {
@@ -353,7 +380,11 @@ static int proba_fc_fwd(int m, int n, int *n_ok, int *n_fal)
         }
     }
 
-    free(W); free(b); free(x); free(y_c); free(y_g);
+    free(W);
+    free(b);
+    free(x);
+    free(y_c);
+    free(y_g);
     return 0;
 }
 
@@ -374,7 +405,9 @@ static int proba_repetita(int m, int n, int reps, int *n_ok, int *n_fal)
     if (!W || !x || !y) {
         printf("FALLIT: malloc\n");
         (*n_fal)++;
-        free(W); free(x); free(y);
+        free(W);
+        free(x);
+        free(y);
         return -1;
     }
 
@@ -401,7 +434,9 @@ static int proba_repetita(int m, int n, int reps, int *n_ok, int *n_fal)
     printf("OK\n");
     (*n_ok)++;
 
-    free(W); free(x); free(y);
+    free(W);
+    free(x);
+    free(y);
     return 0;
 }
 

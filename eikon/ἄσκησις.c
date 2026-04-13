@@ -19,25 +19,34 @@ int εικ_ἄσκησις_ἄρχε(εικ_ἄσκησις_t *ἀ, const εικ
 {
     memset(ἀ, 0, sizeof(*ἀ));
 
-    size_t n  = εικ_μέγεθος_σταθμῶν(σ);
-    int εδ    = σ->εικ_πλάτος * σ->εικ_ὕψος;
-    int μεγδ  = εδ;
-    if (σ->γ_κρυ2 > μεγδ) μεγδ = σ->γ_κρυ2;
-    if (σ->κ_κρυ1 > μεγδ) μεγδ = σ->κ_κρυ1;
+    size_t n = εικ_μέγεθος_σταθμῶν(σ);
+    int εδ   = σ->εικ_πλάτος * σ->εικ_ὕψος;
+    int μεγδ = εδ;
+    if (σ->γ_κρυ2 > μεγδ)
+        μεγδ = σ->γ_κρυ2;
+    if (σ->κ_κρυ1 > μεγδ)
+        μεγδ = σ->κ_κρυ1;
 
     /* κλίσεις */
     ἀ->κλ_δεδ = calloc(n, sizeof(float));
-    if (!ἀ->κλ_δεδ) return -1;
+    if (!ἀ->κλ_δεδ)
+        return -1;
     εικ_σταθμά_ἄρχε_δείκτ(&ἀ->κλ, σ, ἀ->κλ_δεδ);
 
     /* Adam m */
     ἀ->μ_δεδ = calloc(n, sizeof(float));
-    if (!ἀ->μ_δεδ) { εικ_ἄσκησις_τέλει(ἀ); return -1; }
+    if (!ἀ->μ_δεδ) {
+        εικ_ἄσκησις_τέλει(ἀ);
+        return -1;
+    }
     εικ_σταθμά_ἄρχε_δείκτ(&ἀ->μ, σ, ἀ->μ_δεδ);
 
     /* Adam v */
     ἀ->ν_δεδ = calloc(n, sizeof(float));
-    if (!ἀ->ν_δεδ) { εικ_ἄσκησις_τέλει(ἀ); return -1; }
+    if (!ἀ->ν_δεδ) {
+        εικ_ἄσκησις_τέλει(ἀ);
+        return -1;
+    }
     εικ_σταθμά_ἄρχε_δείκτ(&ἀ->ν, σ, ἀ->ν_δεδ);
 
     /* ἐνεργοποιήσεις γενέτου */
@@ -50,21 +59,22 @@ int εικ_ἄσκησις_ἄρχε(εικ_ἄσκησις_t *ἀ, const εικ
     ἀ->γ_z   = malloc((size_t)σ->ζ_διαστ * sizeof(float));
 
     /* ἐνεργοποιήσεις κριτοῦ */
-    ἀ->κ_h1  = malloc((size_t)σ->κ_κρυ1 * sizeof(float));
-    ἀ->κ_a1  = malloc((size_t)σ->κ_κρυ1 * sizeof(float));
-    ἀ->κ_h2  = malloc((size_t)σ->κ_κρυ2 * sizeof(float));
-    ἀ->κ_a2  = malloc((size_t)σ->κ_κρυ2 * sizeof(float));
-    ἀ->κ_in  = malloc((size_t)εδ * sizeof(float));
+    ἀ->κ_h1 = malloc((size_t)σ->κ_κρυ1 * sizeof(float));
+    ἀ->κ_a1 = malloc((size_t)σ->κ_κρυ1 * sizeof(float));
+    ἀ->κ_h2 = malloc((size_t)σ->κ_κρυ2 * sizeof(float));
+    ἀ->κ_a2 = malloc((size_t)σ->κ_κρυ2 * sizeof(float));
+    ἀ->κ_in = malloc((size_t)εδ * sizeof(float));
 
     /* temp */
     ἀ->δ_tmp  = malloc((size_t)μεγδ * sizeof(float));
     ἀ->κ_δεικ = malloc((size_t)εδ * sizeof(float));
 
-    if (!ἀ->γ_h1 || !ἀ->γ_a1 || !ἀ->γ_h2 || !ἀ->γ_a2 ||
+    if (
+        !ἀ->γ_h1 || !ἀ->γ_a1 || !ἀ->γ_h2 || !ἀ->γ_a2 ||
         !ἀ->γ_h3 || !ἀ->γ_out || !ἀ->γ_z ||
         !ἀ->κ_h1 || !ἀ->κ_a1 || !ἀ->κ_h2 || !ἀ->κ_a2 ||
-        !ἀ->κ_in || !ἀ->δ_tmp || !ἀ->κ_δεικ)
-    {
+        !ἀ->κ_in || !ἀ->δ_tmp || !ἀ->κ_δεικ
+    ) {
         εικ_ἄσκησις_τέλει(ἀ);
         return -1;
     }
@@ -76,14 +86,23 @@ int εικ_ἄσκησις_ἄρχε(εικ_ἄσκησις_t *ἀ, const εικ
 
 void εικ_ἄσκησις_τέλει(εικ_ἄσκησις_t *ἀ)
 {
-    free(ἀ->κλ_δεδ);  free(ἀ->μ_δεδ);   free(ἀ->ν_δεδ);
-    free(ἀ->γ_h1);    free(ἀ->γ_a1);
-    free(ἀ->γ_h2);    free(ἀ->γ_a2);
-    free(ἀ->γ_h3);    free(ἀ->γ_out);    free(ἀ->γ_z);
-    free(ἀ->κ_h1);    free(ἀ->κ_a1);
-    free(ἀ->κ_h2);    free(ἀ->κ_a2);
+    free(ἀ->κλ_δεδ);
+    free(ἀ->μ_δεδ);
+    free(ἀ->ν_δεδ);
+    free(ἀ->γ_h1);
+    free(ἀ->γ_a1);
+    free(ἀ->γ_h2);
+    free(ἀ->γ_a2);
+    free(ἀ->γ_h3);
+    free(ἀ->γ_out);
+    free(ἀ->γ_z);
+    free(ἀ->κ_h1);
+    free(ἀ->κ_a1);
+    free(ἀ->κ_h2);
+    free(ἀ->κ_a2);
     free(ἀ->κ_in);
-    free(ἀ->δ_tmp);   free(ἀ->κ_δεικ);
+    free(ἀ->δ_tmp);
+    free(ἀ->κ_δεικ);
     memset(ἀ, 0, sizeof(*ἀ));
 }
 
@@ -104,15 +123,15 @@ void εικ_κλ_μηδέν(εικ_ἄσκησις_t *ἀ, const εικ_σύνθ
 static void adam_range(
     float *θ, float *κλ, float *m, float *v,
     size_t n, int step,
-    float lr, float β1, float β2, float ε)
-{
+    float lr, float β1, float β2, float ε
+) {
     float bc1 = 1.0f - powf(β1, (float)(step + 1));
     float bc2 = 1.0f - powf(β2, (float)(step + 1));
 
     for (size_t i = 0; i < n; i++) {
-        float g = κλ[i];
-        m[i] = β1 * m[i] + (1.0f - β1) * g;
-        v[i] = β2 * v[i] + (1.0f - β2) * g * g;
+        float g  = κλ[i];
+        m[i]     = β1 * m[i] + (1.0f - β1) * g;
+        v[i]     = β2 * v[i] + (1.0f - β2) * g * g;
         float mh = m[i] / bc1;
         float vh = v[i] / bc2;
         θ[i] -= lr * mh / (sqrtf(vh) + ε);
@@ -125,8 +144,8 @@ static void adam_range(
 
 void εικ_βῆμα_ἀδάμ_κρι(
     εικ_t *ε, εικ_ἄσκησις_t *ἀ,
-    float lr, float β1, float β2, float ἐψ)
-{
+    float lr, float β1, float β2, float ἐψ
+) {
     const εικ_σύνθεσις_t *σ = &ε->σύνθεσις;
     /* offset κριτοῦ ἐν ταμιείῳ */
     size_t off_κ = (size_t)(ε->σταθμά.κw1 - ε->δεδομένα);
@@ -150,8 +169,8 @@ void εικ_βῆμα_ἀδάμ_κρι(
 
 void εικ_βῆμα_ἀδάμ_γεν(
     εικ_t *ε, εικ_ἄσκησις_t *ἀ,
-    float lr, float β1, float β2, float ἐψ)
-{
+    float lr, float β1, float β2, float ἐψ
+) {
     /* ἀρχὴ ταμιείου μέχρι κw1 εἶναι γενέτης */
     size_t n_γ = (size_t)(ε->σταθμά.κw1 - ε->δεδομένα);
 

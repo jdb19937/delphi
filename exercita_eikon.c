@@ -63,7 +63,8 @@ static float randf(void)
 static float randn(void)
 {
     float u1 = randf();
-    if (u1 < 1e-10f) u1 = 1e-10f;
+    if (u1 < 1e-10f)
+        u1 = 1e-10f;
     float u2 = randf();
     return sqrtf(-2.0f * logf(u1)) * cosf(6.2831853f * u2);
 }
@@ -85,8 +86,8 @@ static int randi(int n)
  */
 static int lege_gif_canum(
     const char *via, float *dest,
-    int dest_lat, int dest_alt)
-{
+    int dest_lat, int dest_alt
+) {
     pfr_gif_lector_t *l = pfr_gif_lege_initia(via);
     if (!l)
         return -1;
@@ -98,7 +99,10 @@ static int lege_gif_canum(
     }
 
     uint32_t *pix = malloc((size_t)lat * alt * sizeof(uint32_t));
-    if (!pix) { pfr_gif_lege_fini(l); return -1; }
+    if (!pix) {
+        pfr_gif_lege_fini(l);
+        return -1;
+    }
 
     if (pfr_gif_lege_tabulam(l, pix) < 0) {
         free(pix);
@@ -115,12 +119,14 @@ static int lege_gif_canum(
         for (int dx = 0; dx < dest_lat; dx++) {
             int ox = (int)(dx * sx);
             int oy = (int)(dy * sy);
-            if (ox >= lat) ox = lat - 1;
-            if (oy >= alt) oy = alt - 1;
+            if (ox >= lat)
+                ox = lat - 1;
+            if (oy >= alt)
+                oy = alt - 1;
             uint32_t argb = pix[oy * lat + ox];
-            int r = (argb >> 16) & 0xFF;
-            int g = (argb >> 8)  & 0xFF;
-            int b =  argb        & 0xFF;
+            int r         = (argb >> 16) & 0xFF;
+            int g         = (argb >> 8)  & 0xFF;
+            int b         =  argb        & 0xFF;
             /* luminantia -> [-1, 1] */
             float gray = (r * 0.299f + g * 0.587f + b * 0.114f) / 127.5f - 1.0f;
             dest[dy * dest_lat + dx] = gray;
@@ -142,15 +148,16 @@ static int lege_gif_canum(
  */
 static int scribe_specimen_gif(
     const char *via, const float *imagines, int n,
-    int eik_lat, int eik_alt)
-{
-    int cols = (int)ceilf(sqrtf((float)n));
-    int rows = (n + cols - 1) / cols;
+    int eik_lat, int eik_alt
+) {
+    int cols    = (int)ceilf(sqrtf((float)n));
+    int rows    = (n + cols - 1) / cols;
     int tot_lat = cols * eik_lat;
     int tot_alt = rows * eik_alt;
 
     uint32_t *pix = calloc((size_t)tot_lat * tot_alt, sizeof(uint32_t));
-    if (!pix) return -1;
+    if (!pix)
+        return -1;
 
     for (int i = 0; i < n; i++) {
         int col = i % cols;
@@ -160,9 +167,11 @@ static int scribe_specimen_gif(
         for (int y = 0; y < eik_alt; y++) {
             for (int x = 0; x < eik_lat; x++) {
                 float v = (img[y * eik_lat + x] + 1.0f) * 127.5f;
-                int g = (int)v;
-                if (g < 0)   g = 0;
-                if (g > 255) g = 255;
+                int g   = (int)v;
+                if (g < 0)
+                    g = 0;
+                if (g > 255)
+                    g = 255;
                 int px = col * eik_lat + x;
                 int py = row * eik_alt + y;
                 pix[py * tot_lat + px] =
@@ -172,7 +181,10 @@ static int scribe_specimen_gif(
     }
 
     pfr_gif_t *gif = pfr_gif_initia(via, tot_lat, tot_alt, 0, 1);
-    if (!gif) { free(pix); return -1; }
+    if (!gif) {
+        free(pix);
+        return -1;
+    }
     pfr_gif_modum_pone(gif, PFR_QUANT_MEDIANA, PFR_DITHER_NULLUM);
     pfr_gif_tabulam_adde(gif, pix);
     pfr_gif_fini(gif);
@@ -187,36 +199,49 @@ static int scribe_specimen_gif(
 
 static int lege_directorium(
     const char *dir, float **data, int *n_img,
-    int eik_lat, int eik_alt)
-{
+    int eik_lat, int eik_alt
+) {
     DIR *d = opendir(dir);
-    if (!d) return -1;
+    if (!d)
+        return -1;
 
-    int cap = 256, num = 0;
+    int cap     = 256, num = 0;
     int eik_dim = eik_lat * eik_alt;
-    float *buf = malloc((size_t)cap * eik_dim * sizeof(float));
-    if (!buf) { closedir(d); return -1; }
+    float *buf  = malloc((size_t)cap * eik_dim * sizeof(float));
+    if (!buf) {
+        closedir(d);
+        return -1;
+    }
 
     struct dirent *ent;
     while ((ent = readdir(d)) != NULL) {
         const char *nom = ent->d_name;
-        size_t len = strlen(nom);
-        if (len < 4) continue;
-        if (strcmp(nom + len - 4, ".gif") != 0) continue;
+        size_t len      = strlen(nom);
+        if (len < 4)
+            continue;
+        if (strcmp(nom + len - 4, ".gif") != 0)
+            continue;
 
         if (num >= cap) {
             cap *= 2;
             float *nb = realloc(buf, (size_t)cap * eik_dim * sizeof(float));
-            if (!nb) { free(buf); closedir(d); return -1; }
+            if (!nb) {
+                free(buf);
+                closedir(d);
+                return -1;
+            }
             buf = nb;
         }
 
         char via[1024];
         snprintf(via, sizeof(via), "%s/%s", dir, nom);
 
-        if (lege_gif_canum(via, buf + (size_t)num * eik_dim,
-                           eik_lat, eik_alt) == 0)
-        {
+        if (
+            lege_gif_canum(
+                via, buf + (size_t)num * eik_dim,
+                eik_lat, eik_alt
+            ) == 0
+        ) {
             num++;
             if (num % 100 == 0)
                 printf("   %d imagines lectae...\n", num);
@@ -236,7 +261,8 @@ static int lege_directorium(
 int main(int argc, char **argv)
 {
     if (argc < 3) {
-        fprintf(stderr,
+        fprintf(
+            stderr,
             "usus: %s <dir_imaginum> <dir_exemplaris> [n_gradus] [eik_dim]\n"
             "  praedef: n_gradus=%d fascis=%d lr=%.0e eik_dim=%d\n",
             argv[0], PRAEDEF_N_GRADUS, PRAEDEF_FASCIS, PRAEDEF_LR,
@@ -247,8 +273,8 @@ int main(int argc, char **argv)
 
     const char *dir_img = argv[1];
     const char *dir_mod = argv[2];
-    int n_gradus = argc >= 4 ? atoi(argv[3]) : PRAEDEF_N_GRADUS;
-    int eik_dim  = argc >= 5 ? atoi(argv[4]) : PRAEDEF_EIK_LAT;
+    int n_gradus        = argc >= 4 ? atoi(argv[3]) : PRAEDEF_N_GRADUS;
+    int eik_dim         = argc >= 5 ? atoi(argv[4]) : PRAEDEF_EIK_LAT;
 
     printf("=== exercita eikon GAN ===\n\n");
 
@@ -263,9 +289,12 @@ int main(int argc, char **argv)
     float *data  = NULL;
     int    n_img = 0;
 
-    if (lege_directorium(dir_img, &data, &n_img,
-                         eik_dim, eik_dim) < 0 || n_img == 0)
-    {
+    if (
+        lege_directorium(
+            dir_img, &data, &n_img,
+            eik_dim, eik_dim
+        ) < 0 || n_img == 0
+    ) {
         fprintf(stderr, "error: imagines non inventae in '%s'\n", dir_img);
         pfr_computo_fini();
         return 1;
@@ -277,7 +306,8 @@ int main(int argc, char **argv)
 
     if (εικ_ἀνάγνωθι(&eik, via_bin) == 0) {
         printf("2. exemplar oneratum ex '%s'\n", via_bin);
-        printf("   z=%d g1=%d g2=%d eik=%dx%d k1=%d k2=%d\n\n",
+        printf(
+            "   z=%d g1=%d g2=%d eik=%dx%d k1=%d k2=%d\n\n",
             eik.σύνθεσις.ζ_διαστ,
             eik.σύνθεσις.γ_κρυ1, eik.σύνθεσις.γ_κρυ2,
             eik.σύνθεσις.εικ_πλάτος, eik.σύνθεσις.εικ_ὕψος,
@@ -286,9 +316,15 @@ int main(int argc, char **argv)
     } else {
         /* scala strata occulta proportionaliter ad dimensionem imaginis */
         int img_pixels = eik_dim * eik_dim;
-        int g_h2 = img_pixels / 2;  if (g_h2 < 64)  g_h2 = 64;
-        int g_h1 = g_h2 / 4;        if (g_h1 < 32)  g_h1 = 32;
-        int z_d  = g_h1 / 2;        if (z_d  < 16)  z_d  = 16;
+        int g_h2       = img_pixels / 2;
+        if (g_h2 < 64)
+            g_h2 = 64;
+        int g_h1 = g_h2 / 4;
+        if (g_h1 < 32)
+            g_h1 = 32;
+        int z_d  = g_h1 / 2;
+        if (z_d  < 16)
+            z_d  = 16;
         int k_h1 = g_h2;
         int k_h2 = g_h1;
 
@@ -303,7 +339,8 @@ int main(int argc, char **argv)
         };
 
         printf("2. incipio exemplar novum\n");
-        printf("   z=%d g1=%d g2=%d eik=%dx%d k1=%d k2=%d\n",
+        printf(
+            "   z=%d g1=%d g2=%d eik=%dx%d k1=%d k2=%d\n",
             conf.ζ_διαστ, conf.γ_κρυ1, conf.γ_κρυ2,
             conf.εικ_πλάτος, conf.εικ_ὕψος,
             conf.κ_κρυ1, conf.κ_κρυ2
@@ -317,8 +354,10 @@ int main(int argc, char **argv)
         }
 
         size_t n_par = εικ_μέγεθος_σταθμῶν(&conf);
-        printf("   parametri: %zu = %.1f MB\n", n_par,
-               n_par * sizeof(float) / (1024.0 * 1024.0));
+        printf(
+            "   parametri: %zu = %.1f MB\n", n_par,
+            n_par * sizeof(float) / (1024.0 * 1024.0)
+        );
         mkdir(dir_mod, 0755);
     }
     printf("\n");
@@ -336,16 +375,21 @@ int main(int argc, char **argv)
     εικ_gpu_ἄρχε(&eik, &exc);
 
     int eik_pixels = eik.σύνθεσις.εικ_πλάτος * eik.σύνθεσις.εικ_ὕψος;
-    int z_dim   = eik.σύνθεσις.ζ_διαστ;
-    float *z    = malloc((size_t)z_dim * sizeof(float));
-    if (!z) { fprintf(stderr, "error: malloc z\n"); return 1; }
+    int z_dim      = eik.σύνθεσις.ζ_διαστ;
+    float *z       = malloc((size_t)z_dim * sizeof(float));
+    if (!z) {
+        fprintf(stderr, "error: malloc z\n");
+        return 1;
+    }
 
-    printf("3. exerceo (%d gradus, fascis=%d, lr=%.0e)...\n\n",
-           n_gradus, PRAEDEF_FASCIS, PRAEDEF_LR);
+    printf(
+        "3. exerceo (%d gradus, fascis=%d, lr=%.0e)...\n\n",
+        n_gradus, PRAEDEF_FASCIS, PRAEDEF_LR
+    );
 
     /* --- 4. circuitus exercitationis --- */
     float sum_loss_d = 0.0f, sum_loss_g = 0.0f;
-    int n_report = 0;
+    int n_report     = 0;
 
     for (int gradus = 0; gradus < n_gradus; gradus++) {
         float loss_d = 0.0f, loss_g = 0.0f;
@@ -355,7 +399,7 @@ int main(int argc, char **argv)
 
         for (int mi = 0; mi < PRAEDEF_FASCIS; mi++) {
             /* vera imago */
-            int idx = randi(n_img);
+            int idx     = randi(n_img);
             float *real = data + (size_t)idx * eik_pixels;
 
             εικ_κρι_πρόσω_μνήμη(&eik, &exc, real);
@@ -371,14 +415,16 @@ int main(int argc, char **argv)
 
         /* scala κλίσεων */
         {
-            float s = 1.0f / (float)(2 * PRAEDEF_FASCIS);
+            float s    = 1.0f / (float)(2 * PRAEDEF_FASCIS);
             size_t off = (size_t)(eik.σταθμά.κw1 - eik.δεδομένα);
             size_t n_k = eik.μέγεθος - off;
             for (size_t i = 0; i < n_k; i++)
                 exc.κλ_δεδ[off + i] *= s;
         }
-        εικ_βῆμα_ἀδάμ_κρι(&eik, &exc, PRAEDEF_LR,
-                           PRAEDEF_BETA1, PRAEDEF_BETA2, PRAEDEF_EPSILON);
+        εικ_βῆμα_ἀδάμ_κρι(
+            &eik, &exc, PRAEDEF_LR,
+            PRAEDEF_BETA1, PRAEDEF_BETA2, PRAEDEF_EPSILON
+        );
 
         /* --- Γενέτης (Generator) --- */
         εικ_κλ_μηδέν(&exc, &eik.σύνθεσις);
@@ -393,13 +439,15 @@ int main(int argc, char **argv)
         }
 
         {
-            float s = 1.0f / (float)PRAEDEF_FASCIS;
+            float s    = 1.0f / (float)PRAEDEF_FASCIS;
             size_t n_g = (size_t)(eik.σταθμά.κw1 - eik.δεδομένα);
             for (size_t i = 0; i < n_g; i++)
                 exc.κλ_δεδ[i] *= s;
         }
-        εικ_βῆμα_ἀδάμ_γεν(&eik, &exc, PRAEDEF_LR,
-                           PRAEDEF_BETA1, PRAEDEF_BETA2, PRAEDEF_EPSILON);
+        εικ_βῆμα_ἀδάμ_γεν(
+            &eik, &exc, PRAEDEF_LR,
+            PRAEDEF_BETA1, PRAEDEF_BETA2, PRAEDEF_EPSILON
+        );
 
         /* accumula pro nuntio */
         loss_d /= (float)(2 * PRAEDEF_FASCIS);
@@ -410,10 +458,12 @@ int main(int argc, char **argv)
 
         /* nuntius */
         if ((gradus + 1) % NUNTIUS_GRADUS == 0) {
-            printf("  gradus %5d  D_loss=%.4f  G_loss=%.4f\n",
-                   gradus + 1,
-                   sum_loss_d / n_report,
-                   sum_loss_g / n_report);
+            printf(
+                "  gradus %5d  D_loss=%.4f  G_loss=%.4f\n",
+                gradus + 1,
+                sum_loss_d / n_report,
+                sum_loss_g / n_report
+            );
             fflush(stdout);
             sum_loss_d = 0.0f;
             sum_loss_g = 0.0f;
@@ -423,8 +473,10 @@ int main(int argc, char **argv)
         /* asservatio */
         if ((gradus + 1) % ASSERVATIO_GRADUS == 0) {
             if (εικ_σῶσον(&eik, via_bin) == 0)
-                printf("  [asservatio: gradus %d -> %s]\n",
-                       gradus + 1, via_bin);
+                printf(
+                    "  [asservatio: gradus %d -> %s]\n",
+                    gradus + 1, via_bin
+                );
             else
                 fprintf(stderr, "  monitum: asservatio defecit\n");
         }
@@ -432,29 +484,36 @@ int main(int argc, char **argv)
         /* specimen */
         if ((gradus + 1) % SPECIMEN_GRADUS == 0) {
             float *spec = malloc(
-                (size_t)SPECIMEN_N * eik_pixels * sizeof(float));
+                (size_t)SPECIMEN_N * eik_pixels * sizeof(float)
+            );
             if (spec) {
                 unsigned int sp_seed = (unsigned int)(gradus + 1);
                 for (int si = 0; si < SPECIMEN_N; si++) {
                     float zs[256];
                     for (int i = 0; i < z_dim; i++) {
-                        sp_seed = sp_seed * 1664525u + 1013904223u;
+                        sp_seed  = sp_seed * 1664525u + 1013904223u;
                         float u1 = (sp_seed >> 8) / 16777216.0f;
-                        if (u1 < 1e-10f) u1 = 1e-10f;
-                        sp_seed = sp_seed * 1664525u + 1013904223u;
+                        if (u1 < 1e-10f)
+                            u1 = 1e-10f;
+                        sp_seed  = sp_seed * 1664525u + 1013904223u;
                         float u2 = (sp_seed >> 8) / 16777216.0f;
                         zs[i] = sqrtf(-2.0f * logf(u1))
-                               * cosf(6.2831853f * u2);
+                        * cosf(6.2831853f * u2);
                     }
                     εικ_γεν_πρόσω(&eik, zs, spec + (size_t)si * eik_pixels);
                 }
 
-                snprintf(via_spec, sizeof(via_spec),
-                         "%s/specimen_%05d.gif", dir_mod, gradus + 1);
-                if (scribe_specimen_gif(via_spec, spec, SPECIMEN_N,
-                    eik.σύνθεσις.εικ_πλάτος,
-                    eik.σύνθεσις.εικ_ὕψος) == 0)
-                {
+                snprintf(
+                    via_spec, sizeof(via_spec),
+                    "%s/specimen_%05d.gif", dir_mod, gradus + 1
+                );
+                if (
+                    scribe_specimen_gif(
+                        via_spec, spec, SPECIMEN_N,
+                        eik.σύνθεσις.εικ_πλάτος,
+                        eik.σύνθεσις.εικ_ὕψος
+                    ) == 0
+                ) {
                     printf("  [specimen: %s]\n", via_spec);
                 }
                 free(spec);

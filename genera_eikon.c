@@ -28,10 +28,11 @@ static unsigned int g_semen;
 
 static float randn(void)
 {
-    g_semen = g_semen * 1664525u + 1013904223u;
+    g_semen  = g_semen * 1664525u + 1013904223u;
     float u1 = (g_semen >> 8) / 16777216.0f;
-    if (u1 < 1e-10f) u1 = 1e-10f;
-    g_semen = g_semen * 1664525u + 1013904223u;
+    if (u1 < 1e-10f)
+        u1 = 1e-10f;
+    g_semen  = g_semen * 1664525u + 1013904223u;
     float u2 = (g_semen >> 8) / 16777216.0f;
     return sqrtf(-2.0f * logf(u1)) * cosf(6.2831853f * u2);
 }
@@ -53,16 +54,21 @@ static int scribe_gif(const char *via, const float *img, int lat, int alt)
     for (int y = 0; y < out_alt; y++) {
         for (int x = 0; x < out_lat; x++) {
             float v = (img[(y / 2) * lat + (x / 2)] + 1.0f) * 127.5f;
-            int g = (int)v;
-            if (g < 0)   g = 0;
-            if (g > 255) g = 255;
+            int g   = (int)v;
+            if (g < 0)
+                g = 0;
+            if (g > 255)
+                g = 255;
             pix[y * out_lat + x] =
                 0xFF000000u | ((uint32_t)g << 16) | ((uint32_t)g << 8) | (uint32_t)g;
         }
     }
 
     pfr_gif_t *gif = pfr_gif_initia(via, out_lat, out_alt, 0, 1);
-    if (!gif) { free(pix); return -1; }
+    if (!gif) {
+        free(pix);
+        return -1;
+    }
     pfr_gif_modum_pone(gif, PFR_QUANT_MEDIANA, PFR_DITHER_NULLUM);
     pfr_gif_tabulam_adde(gif, pix);
     pfr_gif_fini(gif);
@@ -78,7 +84,8 @@ static int scribe_gif(const char *via, const float *img, int lat, int alt)
 int main(int argc, char **argv)
 {
     if (argc < 3) {
-        fprintf(stderr,
+        fprintf(
+            stderr,
             "usus: %s <dir_exemplaris> <dir_exitus> [n_imagines] [semen]\n",
             argv[0]
         );
@@ -111,9 +118,11 @@ int main(int argc, char **argv)
 
     εικ_gpu_ἄρχε(&eik, NULL);
 
-    printf("exemplar: z=%d eik=%dx%d\n",
-           eik.σύνθεσις.ζ_διαστ,
-           eik.σύνθεσις.εικ_πλάτος, eik.σύνθεσις.εικ_ὕψος);
+    printf(
+        "exemplar: z=%d eik=%dx%d\n",
+        eik.σύνθεσις.ζ_διαστ,
+        eik.σύνθεσις.εικ_πλάτος, eik.σύνθεσις.εικ_ὕψος
+    );
     printf("semen: %u\n", semen);
     printf("imagines: %d\n\n", n_img);
 
@@ -137,9 +146,12 @@ int main(int argc, char **argv)
         char via[1024];
         snprintf(via, sizeof(via), "%s/gen_%04d.gif", dir_out, i);
 
-        if (scribe_gif(via, img, eik.σύνθεσις.εικ_πλάτος,
-                        eik.σύνθεσις.εικ_ὕψος) == 0)
-        {
+        if (
+            scribe_gif(
+                via, img, eik.σύνθεσις.εικ_πλάτος,
+                eik.σύνθεσις.εικ_ὕψος
+            ) == 0
+        ) {
             printf("  %s\n", via);
         } else {
             fprintf(stderr, "  error: %s\n", via);
