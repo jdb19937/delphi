@@ -12,15 +12,18 @@ INCP    = -I. -I$(PREFIX)/include/phantasma -I$(PREFIX)/include/crispus -I$(PREF
 FONTES  = oraculum.c utilia.c \
           openai.c anthropic.c xai.c fictus.c omphalos.c \
           omphalos/δρόμος.c omphalos/λεκτήρ.c \
-          omphalos/ἄσκησις.c
+          omphalos/ἄσκησις.c \
+          eikon/δίκτυον.c eikon/ἄσκησις.c
 
 CAPITA  = oraculum.h provisor.h utilia.h omphalos.h \
-          omphalos/λεκτήρ.h omphalos/ὀμφαλός.h
+          omphalos/λεκτήρ.h omphalos/ὀμφαλός.h \
+          eikon/εἰκών.h
 
 OBIECTA = oraculum.o utilia.o \
           openai.o anthropic.o xai.o fictus.o omphalos.o \
           omphalos/δρόμος.o omphalos/λεκτήρ.o \
-          omphalos/ἄσκησις.o
+          omphalos/ἄσκησις.o \
+          eikon/δίκτυον.o eikon/ἄσκησις.o
 
 BIBLIOTHECA = libdelphi.a
 
@@ -35,10 +38,25 @@ $(BIBLIOTHECA): $(OBIECTA)
 omphalos/%.o: omphalos/%.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
 
+eikon/%.o: eikon/%.c $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
+
 fare: fare.c $(BIBLIOTHECA) $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
 
 exercita: exercita.c $(BIBLIOTHECA) $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
+	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
+
+exercita_eikon: exercita_eikon.c $(BIBLIOTHECA) $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
+	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
+
+genera_eikon: genera_eikon.c $(BIBLIOTHECA) $(CAPITA)
+	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
+	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
+
+proba_eikon: proba_eikon.c $(CAPITA)
 	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
 	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
 
@@ -82,6 +100,7 @@ colloca: omnia
 
 purga:
 	rm -f $(OBIECTA) $(BIBLIOTHECA) fare exercita \
+	    exercita_eikon genera_eikon \
 	    proba_omphalos proba_openai proba_xai proba_anthropic proba_fictus proba_fare \
 	    omphalos_dieta_1526.bin omphalos_dieta_1526.lex
 
