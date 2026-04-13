@@ -15,9 +15,10 @@
 #include <unistd.h>
 
 /* curre fare, cape exitum in tubo, confirma exitum et contenta */
-static int curre(const char *descriptio, char *const argv[],
-                 const char *expectatum)
-{
+static int curre(
+    const char *descriptio, char *const argv[],
+    const char *expectatum
+) {
     printf("  %s: ", descriptio);
     fflush(stdout);
 
@@ -56,14 +57,18 @@ static int curre(const char *descriptio, char *const argv[],
     waitpid(pid, &status, 0);
 
     if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-        printf("defecit (status %d)\n",
-            WIFEXITED(status) ? WEXITSTATUS(status) : -1);
+        printf(
+            "defecit (status %d)\n",
+            WIFEXITED(status) ? WEXITSTATUS(status) : -1
+        );
         return 1;
     }
 
     if (expectatum && !strcasestr(buf, expectatum)) {
-        printf("defecit — '%s' non inventum in responso: %s\n",
-            expectatum, buf);
+        printf(
+            "defecit — '%s' non inventum in responso: %s\n",
+            expectatum, buf
+        );
         return 1;
     }
 
