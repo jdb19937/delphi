@@ -6,7 +6,7 @@
  * Comparat GPU resultata cum CPU referentia.
  */
 
-#include "computo.h"
+#include <phantasma/computo.h>
 
 #include <math.h>
 #include <stdio.h>

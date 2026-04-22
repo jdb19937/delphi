@@ -1,75 +1,68 @@
 # Faceplica — libdelphi.a
 # Oraculum cum provisoribus et metamorphota omphalos.
 
-CC      ?= cc
-CFLAGS  ?= -Wall -Wextra -O2
-AR      ?= ar
-ARFLAGS = rcs
+PREFIX       = /opt/apotheca
 
-PREFIX = /opt/apotheca
-INCP    = -I. -I$(PREFIX)/include/phantasma -I$(PREFIX)/include/crispus -I$(PREFIX)/include/ison
+FONTES       = oraculum.c utilia.c \
+               openai.c anthropic.c xai.c fictus.c omphalos.c \
+               omphalos/δρόμος.c omphalos/λεκτήρ.c \
+               omphalos/ἄσκησις.c \
+               eikon/δίκτυον.c eikon/ἄσκησις.c
 
-FONTES  = oraculum.c utilia.c \
-          openai.c anthropic.c xai.c fictus.c omphalos.c \
-          omphalos/δρόμος.c omphalos/λεκτήρ.c \
-          omphalos/ἄσκησις.c \
-          eikon/δίκτυον.c eikon/ἄσκησις.c
+CAPITA       = oraculum.h provisor.h utilia.h omphalos.h \
+               omphalos/λεκτήρ.h omphalos/ὀμφαλός.h \
+               eikon/εἰκών.h
 
-CAPITA  = oraculum.h provisor.h utilia.h omphalos.h \
-          omphalos/λεκτήρ.h omphalos/ὀμφαλός.h \
-          eikon/εἰκών.h
+OBJECTA      = $(FONTES:.c=.o)
 
-OBIECTA = oraculum.o utilia.o \
-          openai.o anthropic.o xai.o fictus.o omphalos.o \
-          omphalos/δρόμος.o omphalos/λεκτήρ.o \
-          omphalos/ἄσκησις.o \
-          eikon/δίκτυον.o eikon/ἄσκησις.o
+BIBLIOTHECA  = libdelphi.a
 
-BIBLIOTHECA = libdelphi.a
+LIBISON      = $(PREFIX)/lib/libison.a
+LIBCRISPUS   = $(PREFIX)/lib/libcrispus.a
+LIBPHANTASMA = $(PREFIX)/lib/libphantasma.a
+NEXUSPH      = `cat $(PREFIX)/lib/nexus_phantasma`
 
-omnia: $(BIBLIOTHECA) fare
-
-$(BIBLIOTHECA): $(OBIECTA)
-	$(AR) $(ARFLAGS) $@ $^
+omnia: $(BIBLIOTHECA) fare exercita exercita_eikon genera_eikon
 
 %.o: %.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
+	ccc -I $(PREFIX)/include $<
+	# cc -I $(PREFIX)/include -c -o $@ $<
 
-omphalos/%.o: omphalos/%.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
+$(BIBLIOTHECA): $(OBJECTA)
+	ar rcs $@ $^
 
-eikon/%.o: eikon/%.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) -c -o $@ $<
+fare: fare.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
 
-fare: fare.c $(BIBLIOTHECA) $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
+exercita: exercita.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
 
-exercita: exercita.c $(BIBLIOTHECA) $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
-	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
+exercita_eikon: exercita_eikon.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
 
-exercita_eikon: exercita_eikon.c $(BIBLIOTHECA) $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
-	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
+genera_eikon: genera_eikon.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
 
-genera_eikon: genera_eikon.c $(BIBLIOTHECA) $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
-	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
+proba_omphalos: proba_omphalos.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
 
-proba_eikon: proba_eikon.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
-	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
+proba_eikon: proba_eikon.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
 
-proba_omphalos: proba_omphalos.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
-	    `cat $(PREFIX)/lib/nexus_phantasma` -lm -o $@
+proba_openai: proba_openai.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
 
-NEXUS_PROV = $(BIBLIOTHECA) $(PREFIX)/lib/libphantasma.a \
-             $(PREFIX)/lib/libison.a $(PREFIX)/lib/libcrispus.a \
-             `cat $(PREFIX)/lib/nexus_phantasma`
+proba_xai: proba_xai.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
 
-proba_fare: proba_fare.c fare $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< -o $@
+proba_anthropic: proba_anthropic.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
+
+proba_fictus: proba_fictus.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
+
+proba_fare: proba_fare.o
+	ldi proba_fare.o
 
 proba: proba_omphalos proba_fare proba_fictus proba_openai proba_anthropic proba_xai
 	./proba_fictus
@@ -79,32 +72,22 @@ proba: proba_omphalos proba_fare proba_fictus proba_openai proba_anthropic proba
 	./proba_omphalos
 	./proba_fare
 
-proba_openai: proba_openai.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
-
-proba_xai: proba_xai.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
-
-proba_anthropic: proba_anthropic.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
-
-proba_fictus: proba_fictus.c $(CAPITA)
-	$(CC) $(CFLAGS) $(INCP) $< $(NEXUS_PROV) -o $@
-
 colloca: omnia
-	install -d $(PREFIX)/bin $(PREFIX)/lib $(PREFIX)/include/delphi/omphalos
+	install -d $(PREFIX)/bin $(PREFIX)/lib $(PREFIX)/include/delphi/omphalos $(PREFIX)/include/delphi/eikon
 	install -m 755 fare $(PREFIX)/bin/
 	install -m 644 $(BIBLIOTHECA) $(PREFIX)/lib/
 	install -m 644 oraculum.h provisor.h utilia.h omphalos.h $(PREFIX)/include/delphi/
 	install -m 644 omphalos/λεκτήρ.h omphalos/ὀμφαλός.h $(PREFIX)/include/delphi/omphalos/
+	install -m 644 eikon/εἰκών.h $(PREFIX)/include/delphi/eikon/
 
 purga:
-	rm -f $(OBIECTA) $(BIBLIOTHECA) fare exercita \
-	    exercita_eikon genera_eikon \
-	    proba_omphalos proba_openai proba_xai proba_anthropic proba_fictus proba_fare \
-	    omphalos_dieta_1526.bin omphalos_dieta_1526.lex
+	rm -f $(OBJECTA) $(BIBLIOTHECA) fare exercita exercita_eikon genera_eikon
+	rm -f fare.o exercita.o exercita_eikon.o genera_eikon.o
+	rm -f proba_omphalos proba_eikon proba_openai proba_xai proba_anthropic proba_fictus proba_fare
+	rm -f proba_omphalos.o proba_eikon.o proba_openai.o proba_xai.o proba_anthropic.o proba_fictus.o proba_fare.o
+	rm -f omphalos_dieta_1526.bin
 
 linte:
 	insinulint -c $(FONTES) $(CAPITA)
 
-.PHONY: omnia colloca purga linte proba
+.PHONY: omnia colloca purga proba linte

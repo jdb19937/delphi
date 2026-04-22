@@ -10,8 +10,9 @@
  */
 
 #include "eikon/εἰκών.h"
-#include "computo.h"
-#include "phantasma.h"
+
+#include <phantasma/computo.h>
+#include <phantasma/phantasma.h>
 
 #include <math.h>
 #include <stdio.h>
