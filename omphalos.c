@@ -120,7 +120,7 @@ static float fortuitus(unsigned long long *r)
 typedef struct {
     float p;
     int i;
-}pi_t;
+} pi_t;
 
 static int pi_comp(const void *a, const void *b)
 {

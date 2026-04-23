@@ -759,9 +759,15 @@ void oraculum_numeri(oraculum_numeri_t *num)
     num->liberae   = 0;
     for (int i = 0; i < FOSSA_MAX; i++) {
         switch (fossae[i].actum) {
-        case FOSSA_LIBERA:   num->liberae++;   break;
-        case FOSSA_VOLANS:   num->pendentes++; break;
-        case FOSSA_PERFECTA: num->paratae++;   break;
+        case FOSSA_LIBERA:
+            num->liberae++;
+            break;
+        case FOSSA_VOLANS:
+            num->pendentes++;
+            break;
+        case FOSSA_PERFECTA:
+            num->paratae++;
+            break;
         }
     }
     /* summas computa ex lexico iterando per genera */

@@ -183,7 +183,7 @@ int main(int argc, char **argv)
 
     if (rogatum_fasc) {
         size_t n = 0;
-        rogatum = lege_fasciculum(rogatum_fasc, &n);
+        rogatum  = lege_fasciculum(rogatum_fasc, &n);
         if (!rogatum) {
             fprintf(stderr, "%s: fasciculum legere non potui: %s\n", argv[0], rogatum_fasc);
             free(fasciculi);
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
     }
 
     for (int i = 0; i < fasciculi_n; i++) {
-        size_t n = 0;
+        size_t n         = 0;
         char  *contentum = lege_fasciculum(fasciculi[i], &n);
         if (!contentum) {
             fprintf(stderr, "%s: fasciculum legere non potui: %s\n", argv[0], fasciculi[i]);
@@ -212,12 +212,14 @@ int main(int argc, char **argv)
             return 1;
         }
         char caput[1024];
-        int  cn = snprintf(caput, sizeof(caput),
-                           "\n\n--- appendix: %s ---\n", fasciculi[i]);
+        int  cn = snprintf(
+            caput, sizeof(caput),
+            "\n\n--- appendix: %s ---\n", fasciculi[i]
+        );
         if (cn < 0 || cn >= (int)sizeof(caput))
             cn = (int)strlen(caput);
         int ok = adiunge(&rogatum, &rog_lon, &rog_cap, caput, (size_t)cn) == 0
-              && adiunge(&rogatum, &rog_lon, &rog_cap, contentum, n) == 0;
+            && adiunge(&rogatum, &rog_lon, &rog_cap, contentum, n) == 0;
         free(contentum);
         if (!ok) {
             fprintf(stderr, "memoria defecit\n");
@@ -234,8 +236,10 @@ int main(int argc, char **argv)
     size_t rog_pre = rog_lon;
     rog_lon        = utf8_mundus(rogatum, rog_cap, rogatum);
     if (rog_lon != rog_pre)
-        fprintf(stderr, "monitum: %zu bytes invalidos e rogato purgavi\n",
-                rog_pre - rog_lon);
+        fprintf(
+            stderr, "monitum: %zu bytes invalidos e rogato purgavi\n",
+            rog_pre - rog_lon
+        );
 
     srand((unsigned)time(NULL));
     oraculum_initia();

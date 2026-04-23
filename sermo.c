@@ -43,7 +43,7 @@ static int lege_lineam(char **linea, size_t *cap)
     for (;;) {
         if (lon + 2 > *cap) {
             size_t novum = *cap ? *cap * 2 : 256;
-            char *t = realloc(*linea, novum);
+            char *t      = realloc(*linea, novum);
             if (!t)
                 return -1;
             *linea = t;
@@ -116,11 +116,13 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    fprintf(stderr, "sermo cum %s. exi cum /exit aut Ctrl-D.\n",
-            oraculum_sapientum());
+    fprintf(
+        stderr, "sermo cum %s. exi cum /exit aut Ctrl-D.\n",
+        oraculum_sapientum()
+    );
 
-    char  *linea = NULL;
-    size_t cap   = 0;
+    char  *linea   = NULL;
+    size_t cap     = 0;
     int    rc_exit = 0;
 
     for (;;) {
@@ -159,14 +161,16 @@ int main(int argc, char **argv)
         }
 
         /* purga UTF-8 invalidum in loco */
-        size_t lon = strlen(linea);
+        size_t lon       = strlen(linea);
         size_t novum_lon = utf8_mundus(linea, cap, linea);
         if (novum_lon != lon)
-            fprintf(stderr,
-                    "monitum: %zu bytes invalidos purgavi\n", lon - novum_lon);
+            fprintf(
+                stderr,
+                "monitum: %zu bytes invalidos purgavi\n", lon - novum_lon
+            );
 
         char *resp = NULL;
-        int rc = oraculum_sessio_roga(sessio, linea, &resp);
+        int rc     = oraculum_sessio_roga(sessio, linea, &resp);
         if (rc == 0 && resp) {
             printf("%s\n", resp);
             fflush(stdout);
