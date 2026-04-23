@@ -267,10 +267,10 @@ static void signa(
  * ================================================================ */
 
 const provisor_t provisor_omphalos = {
-    "omphalos",
-    "",
-    "",
-    para,
-    extrahe,
-    signa
+    .nomen      = "omphalos",
+    .clavis_env = "",
+    .finis_url  = "",
+    .para       = para,
+    .extrahe    = extrahe,
+    .signa      = signa
 };

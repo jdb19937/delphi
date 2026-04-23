@@ -22,7 +22,7 @@ LIBCRISPUS   = $(PREFIX)/lib/libcrispus.a
 LIBPHANTASMA = $(PREFIX)/lib/libphantasma.a
 NEXUSPH      = `cat $(PREFIX)/lib/nexus_phantasma`
 
-omnia: $(BIBLIOTHECA) fare exercita exercita_eikon genera_eikon
+omnia: $(BIBLIOTHECA) fare sermo exercita exercita_eikon genera_eikon
 
 %.o: %.c $(CAPITA)
 	ccc -I $(PREFIX)/include $<
@@ -32,6 +32,9 @@ $(BIBLIOTHECA): $(OBJECTA)
 	ar rcs $@ $^
 
 fare: fare.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
+	ldi $(NEXUSPH) $^
+
+sermo: sermo.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)
 	ldi $(NEXUSPH) $^
 
 exercita: exercita.o $(BIBLIOTHECA) $(LIBPHANTASMA) $(LIBISON) $(LIBCRISPUS)

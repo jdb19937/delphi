@@ -32,6 +32,21 @@ typedef struct provisor {
         char **corpus, struct crispus_slist **capita
     );
 
+    /*
+     * para rogatum HTTP cum sessione (historia colloquii).
+     * Potest esse NULL; si ita, oraculum concatenat historiam cum
+     * annotationibus personarum et vocat para() ordinariam.
+     *   roles, textus — arrays paralleli longitudinis n
+     *                   ("user" vel "assistant")
+     */
+    int (*para_sessionem)(
+        const char *nomen, const char *conatus,
+        const char *clavis_api,
+        const char *instructiones,
+        const char *const *roles, const char *const *textus, int n,
+        char **corpus, struct crispus_slist **capita
+    );
+
     /* extrahe textum responsi ex ISON crudo API */
     char *(*extrahe)(const char *ison);
 

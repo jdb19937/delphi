@@ -361,6 +361,273 @@ int oraculum_roga(
     return exitus;
 }
 
+/* --- sessio --- */
+
+struct oraculum_sessio {
+    char  sapientum[128];
+    char *instructiones;    /* potest esse NULL */
+    char **roles;
+    char **textus;
+    int   numerus;
+    int   capacitas;
+};
+
+static int sessio_cresce(oraculum_sessio_t *s)
+{
+    if (s->numerus < s->capacitas)
+        return 0;
+    int nova  = s->capacitas ? s->capacitas * 2 : 8;
+    char **nr = realloc(s->roles,  nova * sizeof(char *));
+    char **nt = realloc(s->textus, nova * sizeof(char *));
+    if (!nr || !nt) {
+        free(nr);
+        free(nt);
+        return -1;
+    }
+    s->roles     = nr;
+    s->textus    = nt;
+    s->capacitas = nova;
+    return 0;
+}
+
+static int sessio_appende(
+    oraculum_sessio_t *s, const char *role, const char *textus
+) {
+    if (sessio_cresce(s) < 0)
+        return -1;
+    char *r = strdup(role);
+    char *t = strdup(textus);
+    if (!r || !t) {
+        free(r);
+        free(t);
+        return -1;
+    }
+    s->roles[s->numerus]  = r;
+    s->textus[s->numerus] = t;
+    s->numerus++;
+    return 0;
+}
+
+oraculum_sessio_t *oraculum_sessio_novam(
+    const char *sapientum, const char *instructiones
+) {
+    oraculum_sessio_t *s = calloc(1, sizeof(*s));
+    if (!s)
+        return NULL;
+    snprintf(
+        s->sapientum, sizeof(s->sapientum), "%s",
+        (sapientum && *sapientum) ? sapientum : SAPIENTUM_PRAEFINITUM
+    );
+    if (instructiones) {
+        s->instructiones = strdup(instructiones);
+        if (!s->instructiones) {
+            free(s);
+            return NULL;
+        }
+    }
+    return s;
+}
+
+int oraculum_sessio_numerus(const oraculum_sessio_t *s)
+{
+    return s ? s->numerus : 0;
+}
+
+void oraculum_sessio_dimitte(oraculum_sessio_t *s)
+{
+    if (!s)
+        return;
+    for (int i = 0; i < s->numerus; i++) {
+        free(s->roles[i]);
+        free(s->textus[i]);
+    }
+    free(s->roles);
+    free(s->textus);
+    free(s->instructiones);
+    free(s);
+}
+
+/* concatena historiam cum annotationibus pro provisoribus qui
+ * non implementant para_sessionem */
+static char *sessio_concatena(
+    const char *const *roles, const char *const *textus, int n
+) {
+    size_t mag = 1;
+    for (int i = 0; i < n; i++)
+        mag += strlen(roles[i]) + strlen(textus[i]) + 4;
+    char *buf = malloc(mag);
+    if (!buf)
+        return NULL;
+    char *p = buf;
+    for (int i = 0; i < n; i++) {
+        if (i)
+            *p++ = '\n', *p++ = '\n';
+        p += sprintf(p, "%s: %s", roles[i], textus[i]);
+    }
+    *p = '\0';
+    return buf;
+}
+
+int oraculum_sessio_roga(
+    oraculum_sessio_t *s, const char *rogatum, char **responsum
+) {
+    *responsum = NULL;
+    if (!s || !rogatum)
+        return -1;
+
+    /* appende temporarie turnum usoris */
+    if (sessio_appende(s, "user", rogatum) < 0)
+        return -1;
+
+    char nomen[128], conatus[32];
+    const provisor_t *prov = resolve(
+        s->sapientum,
+        nomen, sizeof(nomen),
+        conatus, sizeof(conatus)
+    );
+
+    /* provisores locales: nulla rete, concat et extrahe */
+    if (
+        strcmp(prov->nomen, "munda") == 0 ||
+        strcmp(prov->nomen, "fictus") == 0 ||
+        strcmp(prov->nomen, "omphalos") == 0
+    ) {
+        char *concat = sessio_concatena(
+            (const char *const *)s->roles,
+            (const char *const *)s->textus,
+            s->numerus
+        );
+        if (!concat) {
+            s->numerus--;
+            free(s->roles[s->numerus]);
+            free(s->textus[s->numerus]);
+            return -1;
+        }
+        if (strcmp(prov->nomen, "omphalos") == 0)
+            omphalos_pone_nomen(nomen);
+        char *resp = prov->extrahe(concat);
+        free(concat);
+        if (!resp) {
+            s->numerus--;
+            free(s->roles[s->numerus]);
+            free(s->textus[s->numerus]);
+            return -1;
+        }
+        if (sessio_appende(s, "assistant", resp) < 0) {
+            free(resp);
+            s->numerus--;
+            free(s->roles[s->numerus]);
+            free(s->textus[s->numerus]);
+            return -1;
+        }
+        *responsum = resp;
+        return 0;
+    }
+
+    const char *clavis = getenv(prov->clavis_env);
+    if (!clavis || !*clavis) {
+        s->numerus--;
+        free(s->roles[s->numerus]);
+        free(s->textus[s->numerus]);
+        return -1;
+    }
+
+    char *corpus = NULL;
+    struct crispus_slist *capita = NULL;
+    int pr;
+
+    if (prov->para_sessionem) {
+        pr = prov->para_sessionem(
+            nomen, conatus, clavis, s->instructiones,
+            (const char *const *)s->roles,
+            (const char *const *)s->textus,
+            s->numerus, &corpus, &capita
+        );
+    } else {
+        char *concat = sessio_concatena(
+            (const char *const *)s->roles,
+            (const char *const *)s->textus,
+            s->numerus
+        );
+        if (!concat) {
+            s->numerus--;
+            free(s->roles[s->numerus]);
+            free(s->textus[s->numerus]);
+            return -1;
+        }
+        pr = prov->para(
+            nomen, conatus, clavis, s->instructiones, concat,
+            &corpus, &capita
+        );
+        free(concat);
+    }
+
+    if (pr < 0) {
+        s->numerus--;
+        free(s->roles[s->numerus]);
+        free(s->textus[s->numerus]);
+        return -1;
+    }
+
+    CRISPUS *crispus = crispus_facilis_initia();
+    if (!crispus) {
+        free(corpus);
+        crispus_slist_libera(capita);
+        s->numerus--;
+        free(s->roles[s->numerus]);
+        free(s->textus[s->numerus]);
+        return -1;
+    }
+
+    struct memoria mem = { NULL, 0 };
+    crispus_facilis_pone(crispus, CRISPUSOPT_URL, prov->finis_url);
+    crispus_facilis_pone(crispus, CRISPUSOPT_CAMPI_POSTAE, corpus);
+    crispus_facilis_pone(crispus, CRISPUSOPT_CAPITA_HTTP, capita);
+    crispus_facilis_pone(crispus, CRISPUSOPT_FUNCTIO_SCRIBENDI, scribe_fn);
+    crispus_facilis_pone(crispus, CRISPUSOPT_DATA_SCRIBENDI, &mem);
+    crispus_facilis_pone(crispus, CRISPUSOPT_TEMPUS, 60L);
+
+    CRISPUScode rc = crispus_facilis_age(crispus);
+    int exitus     = -1;
+    char *resp     = NULL;
+
+    if (rc == CRISPUSE_OK && mem.data) {
+        long codex;
+        crispus_facilis_info(crispus, CRISPUSINFO_CODEX_RESPONSI, &codex);
+        char *extractum = prov->extrahe(mem.data);
+        if (codex >= 200 && codex < 300 && extractum) {
+            resp   = extractum;
+            exitus = 0;
+        } else {
+            free(extractum);
+        }
+    }
+
+    free(mem.data);
+    free(corpus);
+    crispus_facilis_fini(crispus);
+    crispus_slist_libera(capita);
+
+    if (exitus != 0 || !resp) {
+        free(resp);
+        s->numerus--;
+        free(s->roles[s->numerus]);
+        free(s->textus[s->numerus]);
+        return -1;
+    }
+
+    if (sessio_appende(s, "assistant", resp) < 0) {
+        free(resp);
+        s->numerus--;
+        free(s->roles[s->numerus]);
+        free(s->textus[s->numerus]);
+        return -1;
+    }
+
+    *responsum = resp;
+    return 0;
+}
+
 /* --- asynchrona --- */
 
 int oraculum_mitte(

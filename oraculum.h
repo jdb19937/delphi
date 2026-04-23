@@ -34,6 +34,36 @@ int oraculum_roga(
     const char *rogatum, char **responsum
 );
 
+/* --- sessio (colloquium multi-rogati) --- */
+
+typedef struct oraculum_sessio oraculum_sessio_t;
+
+/*
+ * Crea sessionem novam. instructiones potest esse NULL.
+ * sapientum potest esse NULL (utetur praefinitum).
+ */
+oraculum_sessio_t *oraculum_sessio_novam(
+    const char *sapientum, const char *instructiones
+);
+
+/*
+ * Appende rogatum usoris, mitte totam historiam, et si successum
+ * redde responsum adsistentis (appendendum historiae).
+ * Si provisor habet para_sessionem, historia mittitur structurata
+ * (e.g. ut array ISON pro OpenAI); alioquin concatenatur cum
+ * annotationibus personarum.
+ * Reddit 0 si successum. In errato, *responsum = NULL et historia
+ * non mutatur.
+ */
+int oraculum_sessio_roga(
+    oraculum_sessio_t *s, const char *rogatum, char **responsum
+);
+
+/* Quantum turnorum in historia (includens rogata et responsa). */
+int oraculum_sessio_numerus(const oraculum_sessio_t *s);
+
+void oraculum_sessio_dimitte(oraculum_sessio_t *s);
+
 /* --- interfacies asynchrona --- */
 
 #define ORACULUM_PENDENS  0
