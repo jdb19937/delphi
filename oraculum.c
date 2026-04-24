@@ -14,6 +14,7 @@
 
 #include <crispus/crispus.h>
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -795,6 +796,176 @@ void oraculum_numeri(oraculum_numeri_t *num)
 const char *oraculum_sapientum(void)
 {
     return sapientum_currens[0] ? sapientum_currens : SAPIENTUM_PRAEFINITUM;
+}
+
+/* --- imago: default black GIF encoder + dispatcher --- */
+
+struct gifbuf {
+    unsigned char *d;
+    size_t n, cap;
+    uint32_t bit_acc;
+    int bit_count;
+    unsigned char block[255];
+    int block_n;
+};
+
+static void gb_grow(struct gifbuf *g, size_t need)
+{
+    if (g->n + need > g->cap) {
+        while (g->n + need > g->cap)
+            g->cap = g->cap ? g->cap * 2 : 256;
+        g->d = realloc(g->d, g->cap);
+    }
+}
+
+static void gb_put(struct gifbuf *g, unsigned char b)
+{
+    gb_grow(g, 1);
+    g->d[g->n++] = b;
+}
+
+static void gb_putmem(struct gifbuf *g, const void *p, size_t n)
+{
+    gb_grow(g, n);
+    memcpy(g->d + g->n, p, n);
+    g->n += n;
+}
+
+static void gb_put16(struct gifbuf *g, unsigned v)
+{
+    gb_put(g, v & 0xFF);
+    gb_put(g, (v >> 8) & 0xFF);
+}
+
+static void gb_block_flush(struct gifbuf *g)
+{
+    if (g->block_n == 0)
+        return;
+    gb_put(g, (unsigned char)g->block_n);
+    gb_putmem(g, g->block, g->block_n);
+    g->block_n = 0;
+}
+
+static void gb_block_byte(struct gifbuf *g, unsigned char b)
+{
+    g->block[g->block_n++] = b;
+    if (g->block_n == 255)
+        gb_block_flush(g);
+}
+
+static void gb_emit_code(struct gifbuf *g, int code, int width)
+{
+    g->bit_acc |= ((uint32_t)code) << g->bit_count;
+    g->bit_count += width;
+    while (g->bit_count >= 8) {
+        gb_block_byte(g, (unsigned char)(g->bit_acc & 0xFF));
+        g->bit_acc >>= 8;
+        g->bit_count -= 8;
+    }
+}
+
+static void gb_emit_flush(struct gifbuf *g)
+{
+    if (g->bit_count > 0) {
+        gb_block_byte(g, (unsigned char)(g->bit_acc & 0xFF));
+        g->bit_acc   = 0;
+        g->bit_count = 0;
+    }
+    gb_block_flush(g);
+}
+
+static int imago_nigra_gif(
+    int latus, unsigned char **bytes_out, size_t *mag_out
+) {
+    if (latus <= 0 || latus > 65535)
+        return -1;
+
+    struct gifbuf g = {0};
+
+    /* header */
+    gb_putmem(&g, "GIF89a", 6);
+
+    /* LSD */
+    gb_put16(&g, latus);
+    gb_put16(&g, latus);
+    gb_put(&g, 0xF0); /* GCT present, color res=8, size flag=0 (2 entries) */
+    gb_put(&g, 0);    /* bg index */
+    gb_put(&g, 0);    /* aspect */
+
+    /* GCT: 2 entries, both black */
+    gb_put(&g, 0); gb_put(&g, 0); gb_put(&g, 0);
+    gb_put(&g, 0); gb_put(&g, 0); gb_put(&g, 0);
+
+    /* image descriptor */
+    gb_put(&g, 0x2C);
+    gb_put16(&g, 0); gb_put16(&g, 0);
+    gb_put16(&g, latus); gb_put16(&g, latus);
+    gb_put(&g, 0);
+
+    /* LZW min code size */
+    gb_put(&g, 2);
+
+    /* LZW data: CLEAR, then N * code 0, then EOI */
+    int code_size = 3;
+    int next_code = 6;
+    const int clear_code = 4;
+    const int eoi_code   = 5;
+
+    gb_emit_code(&g, clear_code, code_size);
+    int last_was_clear = 1;
+    long long n_pix    = (long long)latus * latus;
+    for (long long i = 0; i < n_pix; i++) {
+        gb_emit_code(&g, 0, code_size);
+        if (last_was_clear) {
+            last_was_clear = 0;
+        } else if (code_size < 12 || next_code < 4096) {
+            next_code++;
+            if (next_code == (1 << code_size) && code_size < 12)
+                code_size++;
+        }
+    }
+    gb_emit_code(&g, eoi_code, code_size);
+    gb_emit_flush(&g);
+
+    /* block terminator */
+    gb_put(&g, 0);
+
+    /* trailer */
+    gb_put(&g, 0x3B);
+
+    *bytes_out = g.d;
+    *mag_out   = g.n;
+    return 0;
+}
+
+int oraculum_imago_roga(
+    const char *sapientum, const char *rogatum, int latus,
+    unsigned char **bytes_out, size_t *mag_out
+) {
+    *bytes_out = NULL;
+    *mag_out   = 0;
+
+    char nomen[128], conatus[32];
+    const provisor_t *prov = resolve(
+        sapientum,
+        nomen, sizeof(nomen),
+        conatus, sizeof(conatus)
+    );
+
+    if (prov->imago) {
+        const char *clavis = getenv(prov->clavis_env);
+        if (clavis && *clavis) {
+            if (prov->imago(
+                nomen, clavis, rogatum, latus, bytes_out, mag_out
+            ) == 0 && *bytes_out && *mag_out > 0)
+                return 0;
+            free(*bytes_out);
+            *bytes_out = NULL;
+            *mag_out   = 0;
+        }
+    }
+
+    return imago_nigra_gif(latus, bytes_out, mag_out);
 }
 
 int oraculum_numeri_per_sapientum(oraculum_numeri_modelli_t *tabulatum, int maximus)

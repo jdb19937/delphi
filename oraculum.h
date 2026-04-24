@@ -120,4 +120,19 @@ typedef struct {
 /* da numeros per sapientum. reddit numerum sapientiorum scriptorum. */
 int oraculum_numeri_per_sapientum(oraculum_numeri_modelli_t *arr, int max);
 
+/* --- imago: generatio imaginis (GIF) --- */
+
+#include <stddef.h>
+
+/*
+ * Generat imaginem quadratam (latus x latus) ex rogato.
+ * Reddit bytes GIF in *bytes_out (vocans liberet), magnitudinem in *mag_out.
+ * Si provisor imaginem non supportat, reddit imaginem nigram praefinitam.
+ * Reddit 0 si successum, -1 si erratum.
+ */
+int oraculum_imago_roga(
+    const char *sapientum, const char *rogatum, int latus,
+    unsigned char **bytes_out, size_t *mag_out
+);
+
 #endif /* ORACULUM_H */

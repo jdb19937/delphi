@@ -55,6 +55,21 @@ typedef struct provisor {
         const char *ison, long *accepta, long *recondita,
         long *emissa, long *cogitata
     );
+
+    /*
+     * imago — generatio imaginis (GIF bytes) quadratae lateris `latus`.
+     * Potest esse NULL; si ita, oraculum reddit GIF nigrum praefinitum.
+     *   rogatum     — descriptio imaginis
+     *   latus       — lateris mensura pixelorum
+     *   bytes_out   — *bytes_out allocatur (liberet vocans)
+     *   mag_out     — magnitudo bytes
+     * reddit 0 si successum.
+     */
+    int (*imago)(
+        const char *nomen, const char *clavis_api,
+        const char *rogatum, int latus,
+        unsigned char **bytes_out, size_t *mag_out
+    );
 } provisor_t;
 
 extern const provisor_t provisor_openai;
